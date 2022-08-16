@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Londrina+Solid&display=swap');
+
+.title {
+    font-family: "Londrina Solid", cursive;
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.background{
+	--background: url('/assets/images/background.png')0 0/100% 100% no-repeat;
+}
+
+.header{
+	--background: var(--dark-purple);
+    --color: white;
+}
+
+.menu-separator-style{
+    --background: rgb(255, 255, 255); 
+    height: 3px;
+}
+
+.search-by-name-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 100;
+    font-size: 19px;
+    --color: #ddb7ff;
+}
+
+.search-button-style{
+	--background: var(--dark-purple);
+}
+
+.menu-background-style{
+    --background: rgb(15, 3, 26);
+}
+
+.menu-item-home-style{
+    --background: var(--darker-purple);
+    margin-top: 10px;
+}
+
+.menu-item-filter-style{
+    --background: var(--darker-purple);
+}
+
+.menu-icon-style{
+    color: #FFFFFF;
+    size: 30px;
+}
+
+.menu-label_style{
+    font-family: "Londrina Solid", cursive;
+    font-size: 25px;
+
+    --color: #FFFFFF;
+}
