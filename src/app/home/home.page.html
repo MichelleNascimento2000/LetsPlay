@@ -1,21 +1,13 @@
-<ion-header [translucent]="true">
-    <ion-toolbar>
-        <ion-title>
-            Blank
-        </ion-title>
-    </ion-toolbar>
-</ion-header>
+<ion-content class="background">
+	<ion-img src="./assets/images/logo-full.png" class="logo-full"></ion-img>
 
-<ion-content [fullscreen]="true">
-    <ion-header collapse="condense">
-        <ion-toolbar>
-            <ion-title size="large">Blank</ion-title>
-        </ion-toolbar>
-    </ion-header>
+	<ion-button (click)="redirectToMyGameplays()" class="button">
+		MINHAS JOGATINAS
+	</ion-button>
 
-    <div id="container">
-        <strong>Ready to create an app?</strong>
-        <p>Start with Ionic <a target="_blank" rel="noopener noreferrer"
-                href="https://ionicframework.com/docs/components">UI Components</a></p>
-    </div>
+	<ion-button (click)="redirectToGameSearching()" class="button">
+		PROCURAR JOGOS!
+	</ion-button>
+
+	<ion-img src="./assets/images/logo-icon.png" class="logo-icon"></ion-img>
 </ion-content>

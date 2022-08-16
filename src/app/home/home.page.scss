@@ -1,27 +1,38 @@
-#container {
-    text-align: center;
+@import url("https://fonts.googleapis.com/css2?family=Londrina+Solid&display=swap");
 
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
+.label {
+	font-family: "Londrina Solid", cursive;
 }
 
-#container strong {
-    font-size: 20px;
-    line-height: 26px;
+.background{
+	--background: url('/assets/images/background.png')0 0/100% 100% no-repeat;
 }
 
-#container p {
-    font-size: 16px;
-    line-height: 22px;
-
-    color: #8c8c8c;
-
-    margin: 0;
+.logo-full{
+	width: 80%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 30px;
+	margin-bottom: 50px;
 }
 
-#container a {
-    text-decoration: none;
+.logo-icon{
+	width: 30%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 65%;
+	margin-bottom: 30px;
+}
+
+.button{
+	display: block;
+	margin-left: 60px;
+	margin-right: 60px;
+
+	font-family: "Londrina Solid", cursive;
+	font-size: 20px;
+	--background: rgb(147, 46, 210);
+	--color: rgb(255, 255, 129);
 }

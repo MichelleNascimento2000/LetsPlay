@@ -7,5 +7,11 @@ import { Component } from '@angular/core';
 })
 
 export class HomePage {
-    constructor() {}
+    constructor(){}
+
+    public redirectToGameSearching(){
+	}
+
+	public redirectToMyGameplays(){
+	}
 }
