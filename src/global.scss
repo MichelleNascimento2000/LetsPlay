@@ -29,3 +29,24 @@
     --dark-purple: rgb(78, 16, 116);
     --darker-purple: rgb(47, 7, 84);
 }
+
+//  Style dos loadings
+.loading-info-style{
+    --background: #1E0230;
+    font-family: "Londrina Solid", cursive;
+}
+
+//  Style do alert de erros da API
+.error-alert-style{
+    --background: #400404;
+    font-family: "Londrina Solid", cursive;
+
+    button {
+        color: rgb(247, 213, 203) !important;
+        font-size: 13px !important;
+    }
+    .alert-message {
+        color: #ce4e4e;
+        font-size: 15px;
+    }
+}
