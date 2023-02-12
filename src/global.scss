@@ -30,21 +30,146 @@
     --darker-purple: rgb(47, 7, 84);
 }
 
-//  Style dos loadings
+
+//  Fonte padrão da aplicação
+@import url("https://fonts.googleapis.com/css2?family=Londrina+Solid&display=swap");
+
+//  Cores padrão da aplicação
+:root {
+    --dark-purple: rgb(78, 16, 116);
+    --darker-purple: rgb(47, 7, 84);
+}
+
+//  Título do cabeçalho
+.title {
+    font-family: "Londrina Solid", cursive;
+    font-weight: bold;
+    font-size: 25px;
+}
+
+//  Cabeçalho
+.header{
+    --background: var(--dark-purple);
+    --color: white;
+}
+
+//  Imagem de fundo de todas as páginas
+.background{
+    --background: url('/assets/images/background.png')0 0/100% 100% no-repeat;
+}
+
+//  Botão de busca
+.search-button-style{
+    --background: var(--dark-purple);
+}
+
+//  Barra de input de busca por nome
+.search-by-name-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 100;
+    font-size: 19px;
+    --color: #ddb7ff;
+}
+
+
+//  Toggle do Accordion do menu lateral para exibição dos filtros
+.ion-accordion-toggle-icon{
+    color: white;
+}
+
+//  Exibição de jogo - Imagem de capa
+.cover-style{
+    border-style: solid;
+    border-color: #4E1075;
+    object-fit: cover;
+    margin: auto;
+}
+
+//  Exibição de jogo - Card dos Gêneros
+.genre-card-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 400;
+    margin: 0px;
+
+    --color: #6994BC;
+    --background: #3D0461;
+}
+
+//  Exibição de jogo - Card das Plataformas
+.platform-card-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 400;
+    margin: 0px;
+
+    --color: #6994BC;
+    --background: #3D0461;
+}
+
+//  Exibição de jogo - Card das Empresas
+.company-card-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 400;
+    margin: 0px;
+
+    --color: #6994BC;
+    --background: #3D0461;
+}
+
+//  Exibição de jogo - Card da Data de lançamento
+.date-card-style{
+    text-align: center;
+    font-family: "Londrina Solid", cursive;
+    font-weight: 500;
+    font-size: 14px;
+
+    --color: #FFFFFF;
+    --background: #470B03;
+}
+
+//  Botão para adição de jogo à lista de jogatinas
+.add-game-button-style{
+    --background: #0D9132;
+}
+
+//  Botão de aviso para jogo já adicionado
+.warning-card-style{
+    --background: #8F1705;
+    width: 30px;
+}
+
+//  Item para mensagem para nenhum resultado foi encontrado
+.warning-item-style{
+    --background: #6c1313cd;
+}
+
+//  Estilo da mensagem para quando nenhum resultado foi encontrado
+.warning-label-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 100;
+    font-size: 20px;
+    text-align: center;
+    --color: #d0cdcd;
+}
+
+//  Estilo do elemento de Loading
 .loading-info-style{
     --background: #1E0230;
+    color: rgba(221, 221, 221, 0.756);
     font-family: "Londrina Solid", cursive;
 }
 
-//  Style do alert de erros da API
-.error-alert-style{
+//  Estilo do alert exibido em caso de erro da API
+.error-alert-style {
     --background: #400404;
     font-family: "Londrina Solid", cursive;
-
+    
+    //  Botão de confirmação
     button {
         color: rgb(247, 213, 203) !important;
         font-size: 13px !important;
     }
+
+    //  Estilo da mensagem exibida
     .alert-message {
         color: #ce4e4e;
         font-size: 15px;

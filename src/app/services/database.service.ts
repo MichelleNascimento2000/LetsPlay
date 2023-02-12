@@ -23,7 +23,7 @@ export class DatabaseService {
     //  Controle para exibir mensagem de "Nenhum resultado encontrado" caso não ache jogos
     public hasLoadedGamesOnPage = true;
 
-    //  Controle para saber se todos os jogos da pesquisa foram exibidos no passar de páginas
+    //  Controle para saber se todos os jogos da pesquisa na API foram exibidos no passar de páginas
     public hasReachedMaxPages: Boolean = false;
 
     
@@ -58,16 +58,14 @@ export class DatabaseService {
 
     //  Métodos para elemento de loading
     public loading: HTMLIonLoadingElement;
+
     public async createLoading(messageToShow: string){
         this.loading = await this.loadingController.create({
             message : messageToShow,
             cssClass: 'loading-info-style'
         });
     }
-
-    public allBuiltGames: Game[] = [];
-	public builtGamesToShowMap: Map<Number, Game[]> = new Map();
-
+    
     public async dismissLoading(){
         this.loading.dismiss();
     }
@@ -75,6 +73,10 @@ export class DatabaseService {
     public async presentLoading(){
         await this.loading.present();
     }
+
+    
+    public allBuiltGames: Game[] = [];
+    public builtGamesToShowMap: Map<Number, Game[]> = new Map();
 
     //  Retorna a URL para requisição na API
     public getBuiltQueryURL(): string{
@@ -287,7 +289,7 @@ export class DatabaseService {
                 }
             ));
 		}catch(error){
-			console.log(error);
+			this.showErrorAlert(error);
 		}
         this.allGenres = [];
         this.allGenres.push(...returnedGenres);

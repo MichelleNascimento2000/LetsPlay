@@ -1,57 +1,63 @@
-@import url('https://fonts.googleapis.com/css2?family=Londrina+Solid&display=swap');
-
-.title {
-    font-family: "Londrina Solid", cursive;
-    font-weight: bold;
-    font-size: 25px;
-}
-
-.background{
-	--background: url('/assets/images/background.png')0 0/100% 100% no-repeat;
-}
-
-.header{
-	--background: var(--dark-purple);
-    --color: white;
-}
-
-.menu-separator-style{
-    --background: rgb(255, 255, 255); 
-    height: 3px;
-}
-
-.search-by-name-style{
-    font-family: "Londrina Solid", cursive;
-    font-weight: 100;
-    font-size: 19px;
-    --color: #ddb7ff;
-}
-
-.search-button-style{
-	--background: var(--dark-purple);
-}
-
+//  Menu Lateral - Fundo
 .menu-background-style{
     --background: rgb(15, 3, 26);
 }
 
+//  Menu Lateral - Retornar para Home Page
 .menu-item-home-style{
     --background: var(--darker-purple);
     margin-top: 10px;
 }
 
-.menu-item-filter-style{
-    --background: var(--darker-purple);
-}
-
+//  Menu Lateral - Ícone de cada item
 .menu-icon-style{
     color: #FFFFFF;
     size: 30px;
 }
 
-.menu-label_style{
+//  Menu Lateral - Rótulo de cada item
+.menu-label-style{
     font-family: "Londrina Solid", cursive;
     font-size: 25px;
+    
+    --color: #FFFFFF;
+}
+
+//  Menu Lateral - Item com opções dos filtros
+.menu-item-filter-style{
+    --background: var(--darker-purple);
+}
+
+//  Menu Lateral - Separador de itens
+.menu-separator-style{
+    --background: rgb(255, 255, 255); 
+    height: 3px;
+}
+
+//  Lista de jogos buscados - Item de cada jogo
+.game-item-style{
+    font-family: "Londrina Solid", cursive;
+    padding-left: 10px;
+}
+
+//  Lista de jogos buscados - Card com Nome
+.name-card-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 500;
+    font-size: 18px;
+    margin: 0px;
 
     --color: #FFFFFF;
+    --background: #1E0230;
+}
+
+//  Lista de jogos buscados - Badge com Nota
+.rating-badge-style{
+    --color: #FFFFFF;
+    --background: #A58A35;
+
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }

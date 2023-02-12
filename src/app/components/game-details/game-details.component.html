@@ -1,0 +1,139 @@
+<ion-header>
+	<ion-toolbar class="header">
+
+        <!-- Retornar para a página anterior -->
+		<ion-buttons slot="start">
+			<ion-back-button defaultHref='search'></ion-back-button>
+		</ion-buttons>
+
+		<ion-title class="title">Detalhes</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content class="background">
+	<ion-grid fixed>
+		<ion-row>
+			<ion-col size="6">
+                <!-- Imagem de capa -->
+				<ion-img [src]="gameToShow.coverURL" class="cover-style" style="height: 200px; width: 200px; border-width: 5px;"></ion-img>
+				
+                <ion-row>
+
+                    <!-- Nota -->
+					<ion-col size="5">
+						<ion-card class="rating-card-style">
+							<ion-text>{{gameToShow.rating}}<br></ion-text>
+						</ion-card>
+					</ion-col>
+
+                    <!-- Data de lançamento -->
+					<ion-col size="7">
+						<ion-card class="date-card-style">
+							<ion-text>{{gameToShow.releaseDate}}<br></ion-text>
+						</ion-card>
+					</ion-col>
+
+				</ion-row>
+
+				<ion-row>
+
+                    <!-- Classificação Etária -->
+					<ion-col size="12">
+						<ion-card class="agerating-card-style">
+							<ion-text>{{gameToShow.ageRating}}<br></ion-text>
+						</ion-card>
+					</ion-col>
+				</ion-row>
+			</ion-col>
+
+			<ion-col size="6">
+				<ion-row>
+
+                    <!-- Nome -->
+					<ion-col size="12">
+						<ion-card class="name-card-style">
+							<ion-text>{{gameToShow.name}} <br></ion-text>
+						</ion-card>
+					</ion-col>
+
+				</ion-row>
+
+				<ion-row>
+
+                    <!-- Gêneros -->
+					<ion-col size="12">
+						<ion-card class="genre-card-style" style="font-size: 16px;">
+							<ion-text *ngFor="let genre of gameToShow.genres">> {{genre}}<br></ion-text>
+						</ion-card>
+					</ion-col>
+
+				</ion-row>
+
+				<ion-row>
+
+                    <!-- Plataformas -->
+					<ion-col size="12">
+						<ion-card class="platform-card-style" style="font-size: 16px;">
+							<ion-text *ngFor="let platform of gameToShow.platforms">* {{platform}}<br></ion-text>
+						</ion-card>
+					</ion-col>
+
+				</ion-row>
+
+				<ion-row>
+
+                    <!-- Empresas -->
+					<ion-col size="12">
+						<ion-card class="company-card-style" style="font-size: 16px;">
+							<ion-text *ngFor="let company of gameToShow.companies">- {{company}}<br></ion-text>
+						</ion-card>
+					</ion-col>
+
+				</ion-row>
+
+			</ion-col>
+		</ion-row>
+
+		<ion-row>
+			<ion-col size="8"></ion-col>
+			<ion-col size="2">
+
+                <!-- Adicionar jogo à lista de Jogatinas -->
+				<ion-button class="add-game-button-style">
+					<ion-icon slot="icon-only" name="add"></ion-icon>
+				</ion-button>
+
+			</ion-col>
+			<ion-col size="2">
+
+                <!-- Símbolo de aviso caso jogo já tenha sido adicionado -->
+				<ion-card class="warning-card-style">
+					<ion-text>
+						<ion-img src="./assets/images/warning.png"></ion-img>
+					</ion-text>
+				</ion-card>
+
+			</ion-col>
+		</ion-row>
+
+        <!-- Descrição do jogo -->
+		<ion-row *ngIf="gameToShow.description != null">
+			<ion-col size="4">
+				<ion-card class="title-description-card-style">
+					<ion-text>Descrição<br></ion-text>
+				</ion-card>
+			</ion-col>
+		</ion-row>
+		<ion-row style="margin-bottom: 100px;">
+			<ion-col size="12">
+				<ion-card class="description-card-style">
+					<ion-text *ngIf="gameToShow.description != null; else noDescription">{{gameToShow.description}}<br></ion-text>
+					<ng-template #noDescription>
+						<ion-text>Sem descrição registrada<br></ion-text>
+					</ng-template>
+				</ion-card>
+			</ion-col>
+		</ion-row>
+        
+	</ion-grid>
+</ion-content> 

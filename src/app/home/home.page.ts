@@ -19,15 +19,14 @@ export class HomePage {
 		public storage          : Storage
     ){}
 
-    
     async ngOnInit(){
 
-        //  Evitar recursão de execução mais de uma vez do OnInit  
+        //  Evitar recursão de execução mais de uma vez do OnInit
 		if(!this.databaseService.haveAppOpened){
 			await this.createLoading('Carregando informações necessárias, aguarde...');
 			this.presentLoading();
 
-            //  Se há infos no Storage, apenas atribuir variáveis locais, 
+            //  Se há infos no Storage, apenas atribuir variáveis locais,
             //  e depois atualizar com infos atuais da API
 			if(await this.isStorageCreated()){
 				await this.getAllStorageData();
@@ -45,7 +44,7 @@ export class HomePage {
 			
             this.databaseService.pageSizeCountParam = 10;
             
-            //  Recuperar jogos iniciais 
+            //  Recuperar jogos iniciais
 			await this.databaseService.getGamesFromAPI(
 				this.databaseService.getBuiltQueryURL()
             );
@@ -67,8 +66,6 @@ export class HomePage {
 
     //  Atribui os registros do Storage para as variáveis locais
 	public async getAllStorageData(){
-		console.log('INÍCIO getAllStorageData')
-
 		this.databaseService.allGenres = [];
 		await this.storage.get('genres').then(
 			genre => this.databaseService.allGenres.push(...genre)
@@ -78,8 +75,6 @@ export class HomePage {
 		await this.storage.get('platforms').then(
 			platform => this.databaseService.allPlatforms.push(...platform)
 		);
-
-		console.log('fim getAllStorageData')
 	}
 
     //  Retornar se as duas infos (Gênero e Plataformas) estão salvas no Storage
@@ -99,6 +94,7 @@ export class HomePage {
 
     //  Métodos para elemento de loading
     public loading: HTMLIonLoadingElement;
+    
 	public async createLoading(messageToShow: string){
 		this.loading = await this.loadingController.create({
 			message : messageToShow,

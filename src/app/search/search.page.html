@@ -5,7 +5,7 @@
         <!-- Retornar para a home page -->
 		<ion-item routerLink='/home' class="menu-item-home-style">
 			<ion-icon slot="start" name="home" class="menu-icon-style"></ion-icon>
-			<ion-label class="menu-label_style">Home</ion-label>
+			<ion-label class="menu-label-style">Home</ion-label>
 		</ion-item>
 
         <!-- Separador de itens -->
@@ -14,7 +14,7 @@
         <!-- Redirecionar para a página de gameplays -->
 		<ion-item class="menu-item-filter-style" style="margin-top: 0px;">
 			<ion-icon slot="start" name="game-controller" class="menu-icon-style"></ion-icon>
-			<ion-label class="menu-label_style">Jogatinas</ion-label>
+			<ion-label class="menu-label-style">Jogatinas</ion-label>
 		</ion-item>
 
         <ion-item class="menu-separator-style"></ion-item>
@@ -24,7 +24,7 @@
 			<ion-accordion value="filters">
 				<ion-item slot="header" class="menu-item-filter-style">
 					<ion-icon slot="start" name="funnel" class="menu-icon-style"></ion-icon>
-					<ion-label class="menu-label_style">Filtros</ion-label>
+					<ion-label class="menu-label-style">Filtros</ion-label>
 				</ion-item>
 			</ion-accordion>
 		</ion-accordion-group>
@@ -71,12 +71,12 @@
         <ion-grid fixed>
             <ion-row>
 
-                <ion-col size="4">
+                <ion-col size="4" (click)="gameplaysService.redirectToGameDetails(gameAPI.id)">
 
                     <!-- Imagem de capa -->
                     <ion-row>
                         <ion-col size="12">
-                            <ion-img [src]="gameAPI.coverURL" class="cover-style"></ion-img>
+                            <ion-img [src]="gameAPI.coverURL" class="cover-style" style="width: 75px; height: 75px; border-width: 2px;"></ion-img>
                         </ion-col>
                     </ion-row>
 
@@ -97,7 +97,7 @@
                     </ion-row>
                 </ion-col>
 
-                <ion-col size="5">
+                <ion-col size="5" (click)="gameplaysService.redirectToGameDetails(gameAPI.id)">
 
                     <!-- Nome -->
                     <ion-row>
@@ -138,7 +138,7 @@
                 
                 <ion-col size="3">
 
-                    <!-- Adicionar jogon na lista de Jogatinas -->
+                    <!-- Adicionar jogo na lista de Jogatinas -->
                     <ion-row>
                         <ion-col size="12">
                             <ion-button class="add-game-button-style">

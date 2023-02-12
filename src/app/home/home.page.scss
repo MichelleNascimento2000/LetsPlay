@@ -1,13 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Londrina+Solid&display=swap");
-
-.label {
-	font-family: "Londrina Solid", cursive;
-}
-
-.background{
-	--background: url('/assets/images/background.png')0 0/100% 100% no-repeat;
-}
-
+//  Logotipo do topo da tela
 .logo-full{
 	width: 80%;
 	display: block;
@@ -17,6 +8,7 @@
 	margin-bottom: 50px;
 }
 
+//  Logotipo do rodapé da tela
 .logo-icon{
 	width: 30%;
 	display: block;
@@ -26,6 +18,7 @@
 	margin-bottom: 30px;
 }
 
+//  Botões para ir para as jogatinas e para a busca de jogos
 .button{
 	display: block;
 	margin-left: 60px;

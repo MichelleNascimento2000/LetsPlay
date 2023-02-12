@@ -1,0 +1,54 @@
+//  Card com Nota
+.rating-card-style{
+    text-align: center;
+    font-family: "Londrina Solid", cursive;
+    font-weight: 500;
+    font-size: 14px;
+    
+    --color: #FFFFFF;
+    --background: #A58A35;
+}
+
+//  Card com Classificação etária
+.agerating-card-style{
+    text-align: center;
+    font-family: "Londrina Solid", cursive;
+    font-weight: 500;
+    font-size: 14px;
+
+    --color: #FFFFFF;
+    --background: #6f4805;
+}
+
+//  Card com Nome
+.name-card-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 500;
+    font-size: 25px;
+    margin: 0px;
+
+    --color: #FFFFFF;
+    --background: #1E0230;
+}
+
+//  Card com título da seção de Descrição
+.title-description-card-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 500;
+    font-size: 23px;
+    margin: 0px;
+
+    --color: #FFFFFF;
+    --background: #00244b;
+}
+
+//  Card com as informações da Descrição
+.description-card-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 400;
+    font-size: 16px;
+    margin: 0px;
+
+    --color: #86b5e4;
+    --background: #054991;
+}
