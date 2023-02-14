@@ -20,66 +20,27 @@ export class HomePage {
     ){}
 
     async ngOnInit(){
-
+        
         //  Evitar recursão de execução mais de uma vez do OnInit
-		if(!this.databaseService.haveAppOpened){
-			await this.createLoading('Carregando informações necessárias, aguarde...');
+		if(!this.databaseService.haveAppOpened){ 
+			await this.createLoading('Aguarde...');
 			this.presentLoading();
 
-            //  Se há infos no Storage, apenas atribuir variáveis locais,
-            //  e depois atualizar com infos atuais da API
-			if(await this.isStorageCreated()){
-				await this.getAllStorageData();
-                
-				this.updateAllStorageData();
-				
-            //  Se não há infos no Storage, recuperar da API e atribuir no
-            //  Storage e variáveis locais
-			} else {
-				await this.databaseService.getAllGenresFromAPI();
-				await this.databaseService.getAllPlatformsFromAPI();
-
-				await this.getAllStorageData();
-			}
-			
+            //  Recuperar da API informações dos gêneros e plataformas
+            await this.databaseService.getAllGenresFromAPI();
+            await this.databaseService.getAllPlatformsFromAPI();
+            
+            //  Atribuir o número máximo de registros de jogos a ser pesquisado por vez na API
             this.databaseService.pageSizeCountParam = 10;
             
             //  Recuperar jogos iniciais
 			await this.databaseService.getGamesFromAPI(
 				this.databaseService.getBuiltQueryURL()
             );
-
 			this.databaseService.haveAppOpened = true;
 
 			this.dismissLoading();
 		}
-	}
-
-    //  Chama métodos para armazenar no Storage os registos necessários,
-    //  e os atribui novamente para as variáveis locais
-    public async updateAllStorageData(){
-		await this.databaseService.getAllGenresFromAPI();
-		await this.databaseService.getAllPlatformsFromAPI();
-		
-		this.getAllStorageData();
-	}
-
-    //  Atribui os registros do Storage para as variáveis locais
-	public async getAllStorageData(){
-		this.databaseService.allGenres = [];
-		await this.storage.get('genres').then(
-			genre => this.databaseService.allGenres.push(...genre)
-		);
-
-		this.databaseService.allPlatforms = [];
-		await this.storage.get('platforms').then(
-			platform => this.databaseService.allPlatforms.push(...platform)
-		);
-	}
-
-    //  Retornar se as duas infos (Gênero e Plataformas) estão salvas no Storage
-    public async isStorageCreated(){
-		return (await this.storage.keys()).length >= 2;
 	}
 
     //  Redirecionar para a página de busca de jogos
