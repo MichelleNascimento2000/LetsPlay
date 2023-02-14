@@ -347,4 +347,44 @@ export class DatabaseService {
 
 		return 	dateOfGame.toLocaleDateString('pt-BR', this.dateFormat);
 	}
+
+    //  Buscar jogos por correspondência de input do usuário com nome do jogo
+    public searchByName(): void{
+
+        this.resetHasReachedMaxPages();
+        this.resetShownGameplays();
+        this.resetSearch();
+        this.assignFormattedInputName();
+        this.resetDataIDParam();
+        
+        this.getGamesFromAPI(
+            this.getBuiltQueryURL()
+        );
+    }
+    
+    //  Reseta flag para processo não considerar que as pages da API acabaram
+    public resetHasReachedMaxPages(){
+        this.hasReachedMaxPages = false;
+    }
+
+    //  Resetar jogos carregados no Map de paginação
+    public resetShownGameplays(){
+        this.builtGamesToShowMap = new Map();
+    }
+
+    //  Resetar os parâmetros de paginação da busca na API
+	public resetSearch(){
+        this.pageSizeCountParam = 10;
+        this.pageIndexParam = 1;
+	}
+
+    //  Formatar input por limitação da API quanto aos espaços (precisa ser '%20')
+    public assignFormattedInputName(){
+        this.formattedInputName = this.inputName?.replaceAll(' ', '%20');
+    }
+
+    //  Resetar parâmetro para busca de jogo por ID
+    public resetDataIDParam(){
+        this.dataIDParam = '';
+    }
 }

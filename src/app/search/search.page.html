@@ -39,7 +39,7 @@
 		<ion-buttons slot="start">
 			<ion-menu-button menu="main-menu"></ion-menu-button>
 		</ion-buttons>
-
+        
 		<ion-title class="title">Procure um jogo</ion-title>
 	</ion-toolbar>
 </ion-header>
@@ -51,13 +51,13 @@
 
                 <!-- Barra de pesquisa dos jogos por nome -->
 				<ion-col size="10">
-					<ion-input placeholder="Buscar por nome" type="text" class="search-by-name-style">
+					<ion-input (keyup.enter)="databaseService.searchByName()" [(ngModel)]="this.databaseService.inputName" placeholder="Buscar por nome" type="text" class="search-by-name-style">
 					</ion-input>
 				</ion-col>
-                
+
                 <!-- Botão de submit da pesquisa -->
 				<ion-col size="2">
-					<ion-button class="search-button-style">
+					<ion-button (click)="databaseService.searchByName()" class="search-button-style">
 						<ion-icon slot="icon-only" name="search"></ion-icon>
 					</ion-button>
 				</ion-col>
@@ -67,99 +67,103 @@
 	</ion-item>
 
     <!-- Exibição da lista de jogos filtrados no momento -->
-    <ion-item color="none" class="game-item-style" *ngFor="let gameAPI of this.databaseService.builtGamesToShowMap.get(this.databaseService.currentPage)">
-        <ion-grid fixed>
-            <ion-row>
+	<ion-item color="none" class="game-item-style" *ngFor="let gameAPI of this.databaseService.builtGamesToShowMap.get(this.databaseService.currentPage)">
+		<ion-grid fixed>
+			<ion-row>
 
-                <ion-col size="4" (click)="gameplaysService.redirectToGameDetails(gameAPI.id)">
-
+				<ion-col size="4" (click)="gameplaysService.redirectToGameDetails(gameAPI.id)">
+					
                     <!-- Imagem de capa -->
                     <ion-row>
-                        <ion-col size="12">
-                            <ion-img [src]="gameAPI.coverURL" class="cover-style" style="width: 75px; height: 75px; border-width: 2px;"></ion-img>
-                        </ion-col>
-                    </ion-row>
+						<ion-col size="12">
+							<ion-img [src]="gameAPI.coverURL" class="cover-style" style="width: 75px; height: 75px; border-width: 2px;"></ion-img>
+						</ion-col>
+					</ion-row>
 
                     <!-- Nota -->
-                    <ion-row>
-                        <ion-col size="12">
-                            <ion-badge class="rating-badge-style" mode="ios" *ngIf="gameAPI.rating != null">{{gameAPI.rating}}</ion-badge>
-                        </ion-col>
-                    </ion-row>
+					<ion-row>
+						<ion-col size="12">
+							<ion-badge class="rating-badge-style" mode="ios" *ngIf="gameAPI.rating != null">{{gameAPI.rating}}</ion-badge>
+						</ion-col>
+					</ion-row>
 
                     <!-- Data de lançamento -->
-                    <ion-row>
-                        <ion-col size="12">
-                            <ion-card class="date-card-style">
-                                <ion-text>{{gameAPI.releaseDate}}<br></ion-text>
-                            </ion-card>
-                        </ion-col>
-                    </ion-row>
-                </ion-col>
+					<ion-row>
+						<ion-col size="12">
+							<ion-card class="date-card-style">
+								<ion-text>{{gameAPI.releaseDate}}<br></ion-text>
+							</ion-card>
+						</ion-col>
+					</ion-row>
+				</ion-col>
 
-                <ion-col size="5" (click)="gameplaysService.redirectToGameDetails(gameAPI.id)">
+				<ion-col size="5" (click)="gameplaysService.redirectToGameDetails(gameAPI.id)">
 
                     <!-- Nome -->
-                    <ion-row>
-                        <ion-col size="12">
-                            <ion-card class="name-card-style">
-                                <ion-text>{{gameAPI.name}} <br></ion-text>
-                            </ion-card>
-                        </ion-col>
-                    </ion-row>
+					<ion-row>
+						<ion-col size="12">
+							<ion-card class="name-card-style">
+								<ion-text>{{gameAPI.name}} <br></ion-text>
+							</ion-card>
+						</ion-col>
+					</ion-row>
 
                     <!-- Gêneros -->
-                    <ion-row>
-                        <ion-col size="12">
-                            <ion-card class="genre-card-style">
-                                <ion-text *ngFor="let genre of gameAPI.genres">> {{genre}}<br></ion-text>
-                            </ion-card>
-                        </ion-col>
-                    </ion-row>
+					<ion-row>
+						<ion-col size="12">
+							<ion-card class="genre-card-style">
+								<ion-text *ngFor="let genre of gameAPI.genres">> {{genre}}<br></ion-text>
+							</ion-card>
+						</ion-col>
+					</ion-row>
 
                     <!-- Plataformas -->
-                    <ion-row>
-                        <ion-col size="12">
-                            <ion-card class="platform-card-style">
-                                <ion-text *ngFor="let platform of gameAPI.platforms">* {{platform}}<br></ion-text>
-                            </ion-card>
-                        </ion-col>
-                    </ion-row>
+					<ion-row>
+						<ion-col size="12">
+							<ion-card class="platform-card-style">
+								<ion-text *ngFor="let platform of gameAPI.platforms">* {{platform}}<br></ion-text>
+							</ion-card>
+						</ion-col>
+					</ion-row>
 
                     <!-- Empresas -->
-                    <ion-row>
-                        <ion-col size="12">
-                            <ion-card class="company-card-style">
-                                <ion-text *ngFor="let company of gameAPI.companies">- {{company}}<br></ion-text>
-                            </ion-card>
-                        </ion-col>
-                    </ion-row>
-                </ion-col>
+					<ion-row>
+						<ion-col size="12">
+							<ion-card class="company-card-style">
+								<ion-text *ngFor="let company of gameAPI.companies">- {{company}}<br></ion-text>
+							</ion-card>
+						</ion-col>
+					</ion-row>
+				</ion-col>
                 
-                <ion-col size="3">
+				<ion-col size="3">
 
                     <!-- Adicionar jogo na lista de Jogatinas -->
-                    <ion-row>
-                        <ion-col size="12">
-                            <ion-button class="add-game-button-style">
-                                <ion-icon slot="icon-only" name="add"></ion-icon>
-                            </ion-button>
-                        </ion-col>
-                    </ion-row>
+					<ion-row>
+						<ion-col size="12">
+							<ion-button class="add-game-button-style">
+								<ion-icon slot="icon-only" name="add"></ion-icon>
+							</ion-button>
+						</ion-col>
+					</ion-row>
 
                     <!-- Símbolo de aviso caso jogo já tenha sido adicionado -->
-                    <ion-row>
-                        <ion-col size="12">
-                            <ion-card class="warning-card-style">
-                                <ion-text>
-                                    <ion-img src="./assets/images/warning.png"></ion-img>
-                                </ion-text>
-                            </ion-card>
-                        </ion-col>
-                    </ion-row>
+					<ion-row>
+						<ion-col size="12">
+							<ion-card class="warning-card-style">
+								<ion-text>
+									<ion-img src="./assets/images/warning.png"></ion-img>
+								</ion-text>
+							</ion-card>
+						</ion-col>
+					</ion-row>
+                    
+				</ion-col>
+			</ion-row>
+		</ion-grid>
+	</ion-item>
 
-                </ion-col>
-            </ion-row>
-        </ion-grid>
-    </ion-item>
+	<ion-item class="warning-item-style" *ngIf="!databaseService.hasLoadedGamesOnPage">
+		<ion-label class="warning-label-style" style="font-size: 20px;">Nenhum resultado encontrado!</ion-label>
+	</ion-item>
 </ion-content>

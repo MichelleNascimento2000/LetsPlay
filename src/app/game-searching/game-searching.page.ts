@@ -22,6 +22,7 @@ export class GameSearchingPage implements OnInit {
     
     ngOnInit(){}
 
+    //  ID do jogo, que é passado como parâmetro na URL
     public idValue = this.route.snapshot.paramMap.get('id');
 	public game: Game;
 }
