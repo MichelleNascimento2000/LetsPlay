@@ -74,8 +74,7 @@ export class DatabaseService {
         await this.loading.present();
     }
 
-    
-    public allBuiltGames: Game[] = [];
+    //  Map para paginação de jogos carregados
     public builtGamesToShowMap: Map<Number, Game[]> = new Map();
 
     //  Retorna a URL para requisição na API
@@ -97,6 +96,7 @@ export class DatabaseService {
 	}
 
 
+    //  Pesquisar na API os jogos necessários recebendo-se a URL da requisição
 	public async getGamesFromAPI(url: string){
 		await this.createLoading('Aguarde...');
 		this.presentLoading();
@@ -181,6 +181,7 @@ export class DatabaseService {
 		this.dismissLoading();
 	}
 
+    //  Exibir alert com erros de API
     public async showErrorAlert(error){
         let messageToShow: string = '';
         Object.keys(error).forEach(function(key) {
@@ -250,7 +251,6 @@ export class DatabaseService {
 			}
 
             this.builtGamesToShowMap.get(this.currentPage).push(game);
-            this.allBuiltGames.push(game);
 		}
 	}
 

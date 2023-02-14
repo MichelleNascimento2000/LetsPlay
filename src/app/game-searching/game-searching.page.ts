@@ -14,7 +14,8 @@ export class GameSearchingPage implements OnInit {
 		private route           : ActivatedRoute,
 		private databaseService : DatabaseService
 	){
-		this.game = this.databaseService.allBuiltGames.find(
+        //  Busca na lista dos jogos carregados na página qual jogo carregar para exibição individual
+		this.game = [].concat(...this.databaseService.builtGamesToShowMap.values()).find(
 			builtGame => builtGame.id == +this.idValue
 		);
 	}
