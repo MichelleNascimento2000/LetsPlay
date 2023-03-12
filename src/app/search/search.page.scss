@@ -34,6 +34,19 @@
     height: 3px;
 }
 
+//  Dropdown de filtros - Item de cada filtro
+.filter-item-style{
+    --background: rgb(104, 25, 177);
+}
+
+//  Dropdown de filtros - Label de cada item por filtro
+.filter-label-style{
+    font-family: "Londrina Solid", cursive;
+    font-size: 18px;
+
+    --color: #FFFFFF;
+}
+
 //  Lista de jogos buscados - Item de cada jogo
 .game-item-style{
     font-family: "Londrina Solid", cursive;

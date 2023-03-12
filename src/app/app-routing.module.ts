@@ -19,6 +19,10 @@ const routes: Routes = [
         path: 'game-searching',
         loadChildren: () => import('./game-searching/game-searching.module').then(m => m.GameSearchingPageModule)
     },
+    {
+        path: 'filter',
+        loadChildren: () => import('./filter/filter.module').then( m => m.FilterPageModule)
+    },
 ];
 
 @NgModule({

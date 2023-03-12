@@ -1,0 +1,21 @@
+//  Estilo da mensagem para quando nenhum resultado foi encontrado
+.warning-label-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 100;
+    font-size: 20px;
+    text-align: center;
+    color: #d0cdcd;
+}
+
+//  Botão para aplicar filtros e buscar jogos
+.search-games-button-style{
+    --background: #5555554c;
+}
+
+//  Estilo da fonte da listagem dos filtross
+.filter-label-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 100;
+    font-size: 16px;
+    --color: #ffffff;
+}

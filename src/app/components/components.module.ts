@@ -4,16 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { GameDetailsComponent } from './game-details/game-details.component';
+import { FilterDetailsComponent } from './filter-details/filter-details.component';
 
 import { IonicModule } from '@ionic/angular';
 
 
 @NgModule({
     declarations: [
-        GameDetailsComponent
+        GameDetailsComponent,
+        FilterDetailsComponent
     ],
     exports: [
-        GameDetailsComponent
+        GameDetailsComponent,
+        FilterDetailsComponent
     ],
     imports: [
         CommonModule,

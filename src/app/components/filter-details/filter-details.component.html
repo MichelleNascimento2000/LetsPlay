@@ -1,0 +1,63 @@
+<!-- Cabeçalho comum para todos os filtros -->
+<ion-header>
+	<ion-toolbar class="header">
+		<ion-buttons slot="start">
+
+            <!-- Ao retornar, resetar os valores para, no próximo acesso à página, exibir apenas os valores selecionados e já aplicados à busca -->
+			<ion-back-button defaultHref='search' (click)="filtersService.resetSelectionsOnReturnToSearch()"></ion-back-button>
+		</ion-buttons>
+		<ion-title class="title">Aplicar filtro - {{filter_name}}</ion-title>		
+	</ion-toolbar>
+</ion-header>
+
+<!-- Filtros de texto (Gêneros, Plataformas, Empresas) -->
+<ion-content class="background" *ngIf="filtersService.isFilterWordList(filter_name)">
+	<ion-grid fixed>
+		<ion-row>
+			<ion-col size="2">
+
+                <!-- Botão de resetar o filtro em questão -->
+				<ion-button (click)="filtersService.resetFilter(filter_name, false)" class="reset-filter-style">
+					<ion-icon slot="start" name="close"></ion-icon>
+					Eliminar filtro
+				</ion-button>
+			</ion-col>
+		</ion-row>
+	</ion-grid>
+    
+    <!-- Buscar filtro por nome --> 
+	<ion-item color="none">
+		<ion-grid fixed>
+			<ion-row>
+				<ion-col size="10">
+					<ion-input  (keyup.enter)="filtersService.search(filter_name)" [(ngModel)]="filtersService.searchValue" 
+                                placeholder="Buscar por nome" type="text" class="search-by-name-style">
+					</ion-input>
+				</ion-col>
+				<ion-col size="2">
+					<ion-button (click)="filtersService.search(filter_name)" class="search-button-style">
+						<ion-icon slot="icon-only" name="search"></ion-icon>
+					</ion-button>
+				</ion-col>
+			</ion-row>
+		</ion-grid>
+	</ion-item>
+
+    <!-- Alerta para caso nenhum filtro tenha sido encontrado dada a busca por nome -->
+	<ion-item class="warning-item-style" *ngIf="!filtersService.hasFoundValue">
+		<ion-label class="warning-label-style">Nenhum resultado encontrado!</ion-label>
+	</ion-item>
+
+    <!-- Aplicar filtro a busca por jogos -->
+	<ion-button (click)="filtersService.searchGames(filter_name)" expand="block" shape="round" class="search-games-button-style" *ngIf="filtersService.optionsToShow.length != 0">
+		Pesquisar
+	</ion-button>
+
+    <!-- Exibição dos filtros -->
+	<ion-item color="none" *ngFor="let item of this.filtersService.optionsToShow">
+		<ion-label class="filter-label-style">{{item.name}}</ion-label>
+		<ion-checkbox slot="start" [(ngModel)]="item.selected"></ion-checkbox>
+	</ion-item>
+
+    <div style="margin-bottom: 100px;"></div>
+</ion-content>

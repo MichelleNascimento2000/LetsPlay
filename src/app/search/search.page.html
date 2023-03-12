@@ -20,14 +20,45 @@
         <ion-item class="menu-separator-style"></ion-item>
 
         <!-- Seleção de filtros a serem usados na pesquisa de jogos -->
-		<ion-accordion-group>
-			<ion-accordion value="filters">
-				<ion-item slot="header" class="menu-item-filter-style">
-					<ion-icon slot="start" name="funnel" class="menu-icon-style"></ion-icon>
-					<ion-label class="menu-label-style">Filtros</ion-label>
-				</ion-item>
-			</ion-accordion>
-		</ion-accordion-group>
+        <ion-accordion-group>
+            <ion-accordion value="filters">
+                <ion-item slot="header" class="menu-item-filter-style">
+                    <ion-icon slot="start" name="funnel" class="menu-icon-style"></ion-icon>
+                    <ion-label class="menu-label-style">Filtros</ion-label>
+                </ion-item>
+
+                <ion-list slot="content" style="background-color: rgb(11, 2, 19);">
+					<ion-row *ngFor="let filter of filtersEnum | keyvalue: originalOrder">
+
+                        <!-- Redireciona para a página do filtro escolhido -->
+						<ion-col size="9" (click)="changeCurrentFilter(filter.value)">
+							<ion-item class="filter-item-style">
+								<ion-label class="filter-label-style">{{filter.value}}</ion-label>
+							</ion-item>
+						</ion-col>
+
+                        <!-- Retirar filtro da filtragem atual -->
+						<ion-col size="2" *ngIf="filtersService.isChosenFilterBeingUsed(filter.value)">
+							<ion-button (click)="filtersService.resetFilter(filter.value, false)" class="reset-filter-style">
+								<ion-icon slot="icon-only" name="close"></ion-icon>
+							</ion-button>
+						</ion-col>
+
+					</ion-row>
+
+                    <!-- Resetar todos os filtros sendo atualmente aplicados -->
+					<ion-row>
+						<ion-col size="12">
+							<ion-button (click)="filtersService.resetAllFilters()" class="reset-filter-style">
+								<ion-icon slot="start" name="close"></ion-icon>
+								Redefinir
+							</ion-button>
+						</ion-col>
+					</ion-row>
+                    
+				</ion-list>
+            </ion-accordion>
+        </ion-accordion-group>
 	</ion-content>
 </ion-menu>
 <ion-router-outlet id="menu-content"></ion-router-outlet>

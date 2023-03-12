@@ -58,6 +58,11 @@
     --background: url('/assets/images/background.png')0 0/100% 100% no-repeat;
 }
 
+//  Resetar filtros escolhidos
+.reset-filter-style{
+    --background: #ff4d0076; 
+}
+
 //  Botão de busca
 .search-button-style{
     --background: var(--dark-purple);
