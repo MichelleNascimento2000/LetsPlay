@@ -19,3 +19,30 @@
     font-size: 16px;
     --color: #ffffff;
 }
+
+//  Filtragem por Nota - Item com a nota mínima
+.minimum-item-style{
+    --background: #1037d33e;
+}
+
+//  Filtragem por Nota - Item com a nota máxima
+.maximum-item-style{
+    --background: #e139133e;
+}
+
+//  Filtragem por Nota - Fonte da descrição do input
+.rating-input-label-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 200;
+    font-size: 25px;
+    --color: #888888;
+}
+
+//  Filtragem por Nota - Fonte do input
+.rating-input-value-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 50;
+    font-size: 21px;
+
+    --color: #FFFFFF;
+}

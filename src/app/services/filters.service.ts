@@ -22,6 +22,23 @@ export class FiltersService {
     //  Opções de filtro que estão sendo exibidas na página
 	public optionsToShow: FilterOption[] = [];
     
+
+    //  Notas buildadas após input do usuário para comparar e validar e;
+    //  Últimas notas entradas pelo usuário, para apresentar na tela após posteriores acessos ao filtro
+    public ratingsInputMap = new Map([
+        ['Minimum', {'rat': 49}],
+        ['Maximum', {'rat': 100}],
+        
+        ['LastMinimum', {'rat': 49}],
+        ['LastMaximum', {'rat': 100}]
+    ]);
+
+    //  Variáveis para verificar e acusar erros quanto ao input dos filtros não textuais
+    public validationNoTextInputMap = new Map([
+        ['Nota',               {'valid': true, 'message': ''}],
+        ['Data de lançamento', {'valid': true, 'message': ''}]
+    ]);
+
     //  Variável para recebre input do usuário para busca de filtros pelo nome
 	public searchValue: string;
 
@@ -74,6 +91,13 @@ export class FiltersService {
                     //  Exibir apenas opções selecionadas caso existam
                     this.setOptionsToShow(selectedCompanyOptions);
                 }
+                break;
+
+            case Filters.Nota:
+
+                //  Setar no campo de nota os valores pré setados, ou os valores padrões caso não haja entrada ainda 
+                this.ratingsInputMap.set('Minimum', this.ratingsInputMap.get('LastMinimum'));
+                this.ratingsInputMap.set('Maximum', this.ratingsInputMap.get('LastMaximum'));
                 break;
 		}
 	}
@@ -151,6 +175,21 @@ export class FiltersService {
 
                     //  Concatenar com termo de filtro da categoria específica, e com os IDs
                     currentFilterParams.query = allIdsQuery != '' ? (currentParam + allIdsQuery) : '';
+                    break;
+
+                case Filters.Nota:
+
+                    //  Recuperar notas entradas pelo usuário
+                    const minimumRating = this.ratingsInputMap.get('Minimum').rat;
+                    const maximumRating = this.ratingsInputMap.get('Maximum').rat;
+
+                    currentFilterParams.query = `${currentParam}${minimumRating},${maximumRating}`;
+                    
+                    //  Setar variáveis com últimas notas entradas
+                    this.ratingsInputMap.set('LastMinimum', {'rat': minimumRating});
+                    this.ratingsInputMap.set('LastMaximum', {'rat': maximumRating});
+
+                    currentFilterParams.useFilter = true;
                     break;
             }
 		}
@@ -308,5 +347,47 @@ export class FiltersService {
 			'Plataformas',
 			'Empresas'
 		].includes(filterName);
+	}
+
+    //  Controle para setar layout de filtro númérico na tela
+	public isFilterNumberRange(filterName: string){
+		return filterName == 'Nota';
+	}
+
+    //  Validar input de nota
+	public validateRatingInput(){
+        const minimumRating = this.ratingsInputMap.get('Minimum').rat;
+        const maximumRating = this.ratingsInputMap.get('Maximum').rat;
+        
+        //  Não pode estar vazio
+		if(!minimumRating || !maximumRating){
+			this.throwNoTextFilterError('Nota', 'Digite um valor para continuar!');
+            return;
+		}
+        
+        //  Não pode exceder o limite de valores presentes na API, que é entre 49 e 100
+        if(maximumRating > 100 || maximumRating < 49 || minimumRating > 100 || minimumRating < 49){
+			this.throwNoTextFilterError('Nota', 'Digite um valor entre 49 e 100!');
+            return;
+		}
+
+        //  Não pode ter o valor máximo como menor que o mínimo
+        if(maximumRating < minimumRating){
+			this.throwNoTextFilterError('Nota', 'O valor mínimo deve ser menor do que o máximo!');
+            return;
+		}
+
+        this.removeNoTextFilterError('Nota');
+	}
+
+    //  Exibe na tela o erro relacionado ao filtro especificado
+	public throwNoTextFilterError(type: string, message: string){
+        this.validationNoTextInputMap.get(type).valid = false;
+        this.validationNoTextInputMap.get(type).message = message;
+	}
+
+    //  Retira da tela o erro relacionado ao filtro especificado
+	public removeNoTextFilterError(type: string){
+		this.validationNoTextInputMap.get(type).valid = true;
 	}
 }

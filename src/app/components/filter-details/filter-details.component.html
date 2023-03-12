@@ -61,3 +61,49 @@
 
     <div style="margin-bottom: 100px;"></div>
 </ion-content>
+
+<!-- Filtro númerico (Nota) -->
+<ion-content class="background" *ngIf="filtersService.isFilterNumberRange(filter_name)">
+	<ion-grid fixed>
+		<ion-row>
+			<ion-col size="2">
+
+                <!-- Botão de resetar o filtro em questão -->
+				<ion-button (click)="filtersService.resetFilter(filter_name, false)" class="reset-filter-style">
+					<ion-icon slot="start" name="close"></ion-icon>
+					Eliminar filtro
+				</ion-button>
+			</ion-col>
+		</ion-row>
+	</ion-grid>
+
+    <!-- Entrar com nota mínima e máxima a ser filtrada -->
+	<ion-item color="none">
+		<ion-grid fixed>
+			<ion-row>
+				<ion-col size="6">
+					<ion-item class="minimum-item-style">
+						<ion-label position="fixed" class="rating-input-label-style">Mínimo</ion-label>
+						<ion-input type="number" class="rating-input-value-style" [(ngModel)]="filtersService.ratingsInputMap.get('Minimum').rat" (ngModelChange)="filtersService.validateRatingInput()"></ion-input>
+					</ion-item>
+				</ion-col>
+				<ion-col size="6">
+					<ion-item class="maximum-item-style">
+						<ion-label position="fixed" class="rating-input-label-style">Máximo</ion-label>
+						<ion-input type="number" class="rating-input-value-style" [(ngModel)]="filtersService.ratingsInputMap.get('Maximum').rat" (ngModelChange)="filtersService.validateRatingInput()"></ion-input>
+					</ion-item>
+				</ion-col>
+			</ion-row>
+		</ion-grid>
+	</ion-item>
+
+    <!-- Exibição de mensagem de erro -->
+	<ion-item class="warning-item-style" *ngIf="!filtersService.validationNoTextInputMap.get(filter_name).valid">
+		<ion-label class="warning-label-style" style="font-size: 15px;">{{filtersService.validationNoTextInputMap.get(filter_name).message}}</ion-label>
+	</ion-item>
+
+    <!-- Aplicar filtro a busca por jogos -->
+	<ion-button (click)="filtersService.searchGames(filter_name)" [disabled]="!filtersService.validationNoTextInputMap.get(filter_name).valid" expand="block" shape="round" class="search-games-button-style">
+		Pesquisar
+	</ion-button>
+</ion-content>
