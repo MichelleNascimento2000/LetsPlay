@@ -46,3 +46,31 @@
 
     --color: #FFFFFF;
 }
+
+//  Filtragem por Data - Fonte da descrição do input
+.date-label-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 50;
+    font-size: 21px;
+    --color: #eecbf2;
+}
+
+//  Filtragem por Data - Input da data mínima
+.minimum-date-input-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 50;
+    font-size: 21px;
+
+    --background: #1037d33e;
+    --color: #FFFFFF;
+}
+
+//  Filtragem por Data - Input da data máxima
+.maximum-date-input-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 50;
+    font-size: 21px;
+
+    --background: #e139133e;
+    --color: #FFFFFF;
+}

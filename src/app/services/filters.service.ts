@@ -4,21 +4,21 @@ import { DatabaseService } from './database.service';
 import { Router } from '@angular/router';
 
 @Injectable({
-	providedIn: 'root'
+    providedIn: 'root'
 })
 export class FiltersService {
 
-	constructor(
+    constructor(
 		public databaseService: DatabaseService,
-        public router         : Router
-	){}
-
+		public router         : Router
+        ){}
+        
     //  Variável para guardar a categoria de filtro que está sendo atualmente configurada
 	public currentFilterName: string;
 
     //  Todas as opções de filtro da categoria selecionada
     public allCurrentOptions: FilterOption[] = [];
-
+    
     //  Opções de filtro que estão sendo exibidas na página
 	public optionsToShow: FilterOption[] = [];
     
@@ -32,6 +32,43 @@ export class FiltersService {
         ['LastMinimum', {'rat': 49}],
         ['LastMaximum', {'rat': 100}]
     ]);
+
+    //  Datas buildadas após input do usuário para comparar e validar e;
+    //  Últimas datas entradas pelo usuário, para apresentar na tela após posteriores acessos ao filtro
+    public builtDatesMap = new Map([
+        ['Minimum', new Date()],
+        ['Maximum', new Date()],
+        
+        ['LastMinimum', new Date()],
+        ['LastMaximum', new Date()]
+    ]);
+
+    //  Atributos a serem usados para o input de data pelo usuário
+    public datesInputMap = new Map([
+        ['Minimum', {'day': 1, 'month': 1, 'year': 2020}],
+        ['Maximum', {'day': 1, 'month': 1, 'year': 2020}],
+    ]);
+
+    //  Variáveis constantes para guardar a parametrização de dias -> mês  
+    public MAX_DAYS_IN_MONTH = {
+        1: 31,
+        2: 28,
+        3: 31,
+        4: 30,
+        5: 31,
+        6: 30,
+        7: 31,
+        8: 31,
+        9: 30,
+        10: 31,
+        11: 30,
+        12: 31,
+    };
+    
+    public MAX_DAYS_IN_MONTH_LEAP_YEAR = {
+        ...this.MAX_DAYS_IN_MONTH,
+        2: 29,
+    };
 
     //  Variáveis para verificar e acusar erros quanto ao input dos filtros não textuais
     public validationNoTextInputMap = new Map([
@@ -84,36 +121,58 @@ export class FiltersService {
                     //  Buscar dinamicamente devido a volume
                     await this.databaseService.getCompaniesFromAPIForFilter(null);
 
-                    this.buildFilterOptions(currentOptions, this.databaseService.searchedCompanies);
+    				this.buildFilterOptions(currentOptions, this.databaseService.searchedCompanies);
                     this.setOptionsToShow(currentOptions);
                 } else {
 
                     //  Exibir apenas opções selecionadas caso existam
                     this.setOptionsToShow(selectedCompanyOptions);
                 }
-                break;
+				break;
 
-            case Filters.Nota:
+			case Filters.Nota:
 
                 //  Setar no campo de nota os valores pré setados, ou os valores padrões caso não haja entrada ainda 
                 this.ratingsInputMap.set('Minimum', this.ratingsInputMap.get('LastMinimum'));
                 this.ratingsInputMap.set('Maximum', this.ratingsInputMap.get('LastMaximum'));
-                break;
+				break;
+
+			case Filters.DataLancamento:
+
+                //  Setar no campo de data os valores pré setados, ou os valores padrões caso não haja entrada ainda
+                const lastMinimumDate = this.builtDatesMap.get('LastMinimum');
+                const lastMaximumDate = this.builtDatesMap.get('LastMaximum');
+
+                this.datesInputMap.set('Minimum', {
+                    'day':      lastMinimumDate.getDate(),
+                    'month':    lastMinimumDate.getMonth() + 1,
+                    'year':     lastMinimumDate.getFullYear()
+                });
+
+                this.datesInputMap.set('Maximum', {
+                    'day':      lastMaximumDate.getDate(),
+                    'month':    lastMaximumDate.getMonth() + 1,
+                    'year':     lastMaximumDate.getFullYear()
+                });
+
+                //  Buildar dado de data
+				this.buildDates();
+				break;
 		}
 	}
 
     //  Criar opções buildadas de filtro
     public buildFilterOptions(listToAdd: FilterOption[], allData: any[]){
-        if(listToAdd.length == 0){
+		if(listToAdd.length == 0){
             listToAdd.push(...allData.map(option => ({
                 preSelected: false,
                 selected   : false,
                 name       : option.name,
                 value      : option.id
             })));
-        }
+		}
         return listToAdd;
-    }
+	}
     
     //  Atualiza array com opções a serem exibidas
 	public setOptionsToShow(optionList: FilterOption[]): void{
@@ -171,7 +230,7 @@ export class FiltersService {
             switch (filterName) {
                 case Filters.Generos:
                 case Filters.Plataformas:
-                case Filters.Empresas:
+                case Filters.Empresas:                    
 
                     //  Concatenar com termo de filtro da categoria específica, e com os IDs
                     currentFilterParams.query = allIdsQuery != '' ? (currentParam + allIdsQuery) : '';
@@ -188,6 +247,23 @@ export class FiltersService {
                     //  Setar variáveis com últimas notas entradas
                     this.ratingsInputMap.set('LastMinimum', {'rat': minimumRating});
                     this.ratingsInputMap.set('LastMaximum', {'rat': maximumRating});
+
+                    currentFilterParams.useFilter = true;
+                    break;
+
+                case Filters.DataLancamento:
+
+                    //  Recuperar datas entradas pelo usuário
+                    const minDateMap = this.datesInputMap.get('Minimum');
+                    const maxDateMap = this.datesInputMap.get('Maximum');
+
+                    const fromDate = `${minDateMap.year}-${minDateMap.month.toString().padStart(2, '0')}-${minDateMap.day.toString().padStart(2, '0')}`;
+                    const toDate   = `${maxDateMap.year}-${maxDateMap.month.toString().padStart(2, '0')}-${maxDateMap.day.toString().padStart(2, '0')}`;
+                    currentFilterParams.query = `${currentParam}${fromDate},${toDate}`;
+
+                    //  Setar variáveis com últimas datas entradas
+                    this.builtDatesMap.set('LastMinimum', this.builtDatesMap.get('Minimum'));
+                    this.builtDatesMap.set('LastMaximum', this.builtDatesMap.get('Maximum'));
 
                     currentFilterParams.useFilter = true;
                     break;
@@ -330,7 +406,7 @@ export class FiltersService {
                 }
             }
         }
-        
+
         this.hasFoundValue = !!this.optionsToShow.length;
 	}
 
@@ -352,6 +428,11 @@ export class FiltersService {
     //  Controle para setar layout de filtro númérico na tela
 	public isFilterNumberRange(filterName: string){
 		return filterName == 'Nota';
+	}
+
+    //  Controle para setar layout de filtro de data na tela
+	public isFilterDate(filterName: string){
+		return filterName == 'Data de lançamento';
 	}
 
     //  Validar input de nota
@@ -379,6 +460,83 @@ export class FiltersService {
 
         this.removeNoTextFilterError('Nota');
 	}
+
+    //  Buildar as datas usando o input do usuário, e setando nas variáveis correspondentes
+	public buildDates(){
+        const minimumDate = this.datesInputMap.get('Minimum');
+        const maximumDate = this.datesInputMap.get('Maximum');
+
+		this.builtDatesMap.set('Minimum', new Date(
+            minimumDate.year + '-' +
+            minimumDate.month + '-' +
+            minimumDate.day
+        ));
+
+		this.builtDatesMap.set('Maximum', new Date(
+            maximumDate.year + '-' +
+            maximumDate.month + '-' +
+            maximumDate.day
+        ));
+	}
+
+    //  Validar se as datas entradas pelo usuário são válidas
+    public isDateValidInGeneral(){
+        const minimumDateMap = this.datesInputMap.get('Minimum');
+        const maximumDateMap = this.datesInputMap.get('Maximum');
+
+        const maxDaysInMonthMin =   this.isLeapYear(minimumDateMap.year)
+                                    ? this.MAX_DAYS_IN_MONTH_LEAP_YEAR
+                                    : this.MAX_DAYS_IN_MONTH;
+
+        const maxDaysInMonthMax =   this.isLeapYear(maximumDateMap.year)
+                                    ? this.MAX_DAYS_IN_MONTH_LEAP_YEAR
+                                    : this.MAX_DAYS_IN_MONTH;
+
+        //  Verifica se o dia é válido de acordo consierando o mês e os anos bissextos
+        const isValidDayMin = (day: number)   => day >= 1 && day <= maxDaysInMonthMin[minimumDateMap.month];
+        const isValidDayMax = (day: number)   => day >= 1 && day <= maxDaysInMonthMax[maximumDateMap.month];
+        
+        //  Verifica se o mês é válido dentro do seu intervalo de 1 a 12
+        const isValidMonth  = (month: number) => month >= 1 && month <= 12;
+
+        //  Verifica se o ano é válido dentro do intervalo mínimo dos jogos presentes na API (maior ou igual que 1954)
+        const isValidYear   = (year: number)  => year >= 1954;
+
+        //  Verifica se dia/mês/ano são válidos para ambos os inputs
+        const isMinimumValid =  isValidDayMin  (minimumDateMap.day) &&
+                                isValidMonth(minimumDateMap.month) &&
+                                isValidYear (minimumDateMap.year);
+  
+        const isMaximumValid =  isValidDayMax(maximumDateMap.day) &&
+                                isValidMonth(maximumDateMap.month) &&
+                                isValidYear (maximumDateMap.year);
+
+        if(!isMinimumValid || !isMaximumValid){
+            this.throwNoTextFilterError('Data de lançamento', 'Data inválida!');
+            return false;
+        }
+        
+        //  Caso as parametrizações individuais das datas sejam realmente válidas, buildar e adicionar ao map correspondente
+        this.buildDates();
+        
+        //  Validar se a data mínima é menor do que a máxima
+        if((this.builtDatesMap.get('Minimum').getTime() > this.builtDatesMap.get('Maximum').getTime())){
+			this.throwNoTextFilterError('Data de lançamento', 'A data mínima deve ser menor do que a máxima!');
+			return false;
+		}
+
+        this.removeNoTextFilterError('Data de lançamento');
+        return true;
+    }
+
+    //  Auxiliar para retornar se o ano é bissexto
+    public isLeapYear(year: number){
+        return year % 400 == 0 ||
+        (
+            year % 4   == 0 &&
+            year % 100 != 0
+        );
+    }
 
     //  Exibe na tela o erro relacionado ao filtro especificado
 	public throwNoTextFilterError(type: string, message: string){
