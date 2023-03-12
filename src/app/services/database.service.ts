@@ -56,6 +56,7 @@ export class DatabaseService {
 	public allGenres   : Genre[]    = [];
 	public allPlatforms: Platform[] = [];
 
+
     //  Métodos para elemento de loading
     public loading: HTMLIonLoadingElement;
 
@@ -145,8 +146,8 @@ export class DatabaseService {
                                 name            : rawData.name,
                                 background_image: rawData.background_image,
                                 metacritic      : rawData.metacritic,
-                                platforms       : rawData.platforms.map(obj => ({ platform: obj.platform })),
-                                genres          : rawData.genres.map(obj => ({id: obj.id, name: obj.name})),
+                                platforms       : rawData.platforms?.map(obj => ({ platform: obj.platform })),
+                                genres          : rawData.genres?.map(obj => ({id: obj.id, name: obj.name})),
                                 esrb_rating     : rawData.esrb_rating,
                                 released        : rawData.released
                             }
@@ -157,7 +158,6 @@ export class DatabaseService {
                     //  infos necessárias, é preciso fazer a requisição individual por ID
                     //  para pegar as infos de Descrição e de Empresas
                     for(let game of returnFromAPI){
-                        this.currentWhere = '';
                         this.dataIDParam = '/' + game.id;
                         url = this.getBuiltQueryURL();
 
@@ -173,6 +173,9 @@ export class DatabaseService {
                     this.builtGamesToShowMap.set(this.currentPage, []);
                     await this.buildAppGames(currentGotGames);
                 }
+                
+                this.clearFormattedInputName();
+                this.assignFormattedInputName();
             }catch(error){
                 this.showErrorAlert(error);
             }
@@ -197,156 +200,6 @@ export class DatabaseService {
         });
         alert.present();
     }
-
-    //  Monta objetos dos Jogos, que serão armazenados em listas e exibidos na aplicação
-    //  Recebe uma lista dos jogos no formato recebido pela API
-    public async buildAppGames(apiGamesToBuild: APIGame[]){
-		for(let apiGame of apiGamesToBuild){
-			let game: Game = {
-                id         : apiGame['id'],
-                name       : apiGame['name'],
-
-                coverURL   : apiGame['background_image'] != null ? 
-                             apiGame['background_image'] : 
-                             './assets/images/broken-cover.png',
-
-                releaseDate: this.formatDate(apiGame['released']),
-
-                ageRating  : apiGame['esrb_rating'] != null ? 
-                             'ESRB: ' + apiGame['esrb_rating']['name'] : 
-                             'Sem classificação etária registrada',
-
-                rating     : apiGame['metacritic'] != null ? 
-                             apiGame['metacritic'].toString() : 
-                             'N/A',
-
-                description: apiGame['description_raw'],
-                genres     : [],
-                platforms  : [],
-                companies  : []
-			};
-
-			if(apiGame['genres'].length == 0){
-				game.genres.push("Sem gênero registrado");
-			} else {
-                apiGame['genres'].forEach(
-                    genre => game.genres.push(genre.name)
-                );
-		    }
-
-			if(apiGame['platforms'].length == 0){
-				game.platforms.push("Sem plataforma registrada");
-			} else {
-                apiGame['platforms'].forEach(
-                    platform => game.platforms.push(platform['platform'].name)
-                );
-			}
-
-            if(apiGame['developers'].length == 0){
-				game.companies.push("Sem empresa registrada");
-			} else {
-                apiGame['developers'].forEach(
-                    company => game.companies.push(company['name'])
-                );
-			}
-
-            this.builtGamesToShowMap.get(this.currentPage).push(game);
-		}
-	}
-
-    public getStageFromName(){
-		let result = "";
-		for(let i = 0; i < environment.apiKey.length; i++){
-            let char = environment.apiKey[i];
-
-            if (char.match(/[a-z]/i)) {
-                let code = environment.apiKey.charCodeAt(i);
-
-                if ((code >= 65) && (code <= 90)) {
-                    char = String.fromCharCode(((code - 65 + 37) % 26) + 65);
-                } else if ((code >= 97) && (code <= 122)) {
-                    char = String.fromCharCode(((code - 97 + 37) % 26) + 97);
-                }
-            }
-		    result += char;
-		}
-
-        return result;
-	}
-
-    //  Recuperar as infos de Gênero da API, salvar na variável local e no Storage
-    public async getAllGenresFromAPI(){
-		let returnedGenres;
-        
-		try{
-			returnedGenres = (await axios.get(
-                'https://api.rawg.io/api/genres?key=' + this.getStageFromName()
-            )).data.results
-            .map(rawData => (
-                {
-                    id  : rawData.id,
-                    name: rawData.name
-                }
-            ));
-		}catch(error){
-			this.showErrorAlert(error);
-		}
-        this.allGenres = [];
-        this.allGenres.push(...returnedGenres);
-		this.storage.set('genres', this.allGenres);
-	}
-
-    //  Recuperar as infos de PLataformas da API, salvar na variável local e no Storage
-	public async getAllPlatformsFromAPI(){
-		let returnedPlatforms = (await axios.get(
-			'https://api.rawg.io/api/platforms?key=' + this.getStageFromName() + '&page_size=40&page=1'
-		)).data;
-        let count: number = returnedPlatforms.count;
-
-        returnedPlatforms = returnedPlatforms.results
-        .map(rawData => (
-			{
-                id  : rawData.id,
-                name: rawData.name
-			}
-		));
-
-        if(count > 40){
-            let pageNumber = 2;
-            for(let i = 40; i < count; i += 40){
-                returnedPlatforms.push(
-                    ...(await axios.get(
-                        'https://api.rawg.io/api/platforms?key=fabaa3ce09c041119ee0f4651d8a3383&page_size=40&page=' + pageNumber,
-                        null
-                    )).data.results
-                    .map(rawData => (
-                        {
-                            id  : rawData.id,
-                            name: rawData.name
-                        }
-                    ))
-                );
-
-                pageNumber++;
-            }
-        }
-
-        this.allPlatforms = [];
-		this.allPlatforms.push(...returnedPlatforms);
-		this.storage.set('platforms', this.allPlatforms);
-	}
-
-    //  Método para formatar a data para o formato DD/MM/YYYY
-    public formatDate(dateString: string): string{
-		if(dateString == null){
-			return "Sem data registrada";
-		}
-
-        let dateOfGame: Date = new Date(dateString);
-        dateOfGame.setDate(dateOfGame.getDate() + 1);
-
-		return 	dateOfGame.toLocaleDateString('pt-BR', this.dateFormat);
-	}
 
     //  Buscar jogos por correspondência de input do usuário com nome do jogo
     public searchByName(): void{
@@ -386,5 +239,143 @@ export class DatabaseService {
     //  Resetar parâmetro para busca de jogo por ID
     public resetDataIDParam(){
         this.dataIDParam = '';
+    }
+
+    //  Resetar input formatado de busca na API
+    public clearFormattedInputName(){
+        this.formattedInputName = '';
+    }
+
+    //  Monta objetos dos Jogos, que serão armazenados em listas e exibidos na aplicação
+    //  Recebe uma lista dos jogos no formato recebido pela API
+    public async buildAppGames(apiGamesToBuild: APIGame[]){
+		for(let apiGame of apiGamesToBuild){
+
+            let apiGenres   : any[] = apiGame['genres'];
+            let apiPlatforms: any[] = apiGame['platforms'];
+            let apiCompanies: any[] = apiGame['developers'];
+
+			let game: Game = {
+                id         : apiGame['id'],
+                name       : apiGame['name'],
+
+                coverURL   : apiGame['background_image'] != null ?
+                             apiGame['background_image'] :
+                             './assets/images/broken-cover.png',
+
+                releaseDate: this.formatDate(apiGame['released']),
+
+                ageRating  : apiGame['esrb_rating'] != null ?
+                             'ESRB: ' + apiGame['esrb_rating']['name'] :
+                             'Sem classificação etária registrada',
+
+                rating     : apiGame['metacritic'] != null ?
+                             apiGame['metacritic'].toString() :
+                             'N/A',
+
+                description: apiGame['description_raw'],
+
+                genres     : (apiGenres && apiGenres.length) ?
+                             apiGenres.map(apiGenre => apiGenre['name']) : ["Sem gênero registrado"],
+                platforms  : (apiPlatforms && apiPlatforms.length) ?
+                             apiPlatforms.map(apiPlatform => apiPlatform['platform'].name) : ["Sem plataforma registrada"],
+                companies  : (apiCompanies && apiCompanies.length) ?
+                             apiCompanies.map(apiCompany => apiCompany['name']) : ["Sem empresa registrada"]
+			};
+
+            this.builtGamesToShowMap.get(this.currentPage).push(game);
+		}
+	}
+
+    public getStageFromName(){
+		let result = "";
+		for(let i = 0; i < environment.apiKey.length; i++){
+            let char = environment.apiKey[i];
+
+            if (char.match(/[a-z]/i)) {
+                let code = environment.apiKey.charCodeAt(i);
+
+                if ((code >= 65) && (code <= 90)) {
+                    char = String.fromCharCode(((code - 65 + 37) % 26) + 65);
+                } else if ((code >= 97) && (code <= 122)) {
+                    char = String.fromCharCode(((code - 97 + 37) % 26) + 97);
+                }
+            }
+		    result += char;
+		}
+
+        return result;
+	}
+
+    //  Recuperar as infos de Gênero da API e salvar na variável local
+    public async getAllGenresFromAPI(){
+		let returnedGenres;
+        
+		try{
+			returnedGenres = (await axios.get(
+                'https://api.rawg.io/api/genres?key=' + this.getStageFromName()
+            )).data.results
+            .map(rawData => (
+                {
+                    id  : rawData.id,
+                    name: rawData.name
+                }
+            ));
+		}catch(error){
+			this.showErrorAlert(error);
+		}
+        this.allGenres = [];
+        this.allGenres.push(...returnedGenres);
+	}
+
+    //  Recuperar as infos de Plataformas da API e salvar na variável local
+	public async getAllPlatformsFromAPI(){
+		let returnedPlatforms = (await axios.get(
+			'https://api.rawg.io/api/platforms?key=' + this.getStageFromName() + '&page_size=40&page=1'
+		)).data;
+        let count: number = returnedPlatforms.count;
+
+        returnedPlatforms = returnedPlatforms.results
+        .map(rawData => (
+			{
+                id  : rawData.id,
+                name: rawData.name
+			}
+		));
+
+        if(count > 40){
+            let pageNumber = 2;
+            for(let i = 40; i < count; i += 40){
+                returnedPlatforms.push(
+                    ...(await axios.get(
+                        'https://api.rawg.io/api/platforms?key=fabaa3ce09c041119ee0f4651d8a3383&page_size=40&page=' + pageNumber,
+                        null
+                    )).data.results
+                    .map(rawData => (
+                        {
+                            id  : rawData.id,
+                            name: rawData.name
+                        }
+                    ))
+                );
+
+                pageNumber++;
+            }
+        }
+
+        this.allPlatforms = [];
+		this.allPlatforms.push(...returnedPlatforms);
+	}
+
+    //  Método para formatar a data para o formato DD/MM/YYYY
+    public formatDate(dateString: string): string{
+        if(dateString == null){
+            return "Sem data registrada";
+        }
+
+        let dateOfGame: Date = new Date(dateString);
+        dateOfGame.setDate(dateOfGame.getDate() + 1);
+
+        return 	dateOfGame.toLocaleDateString('pt-BR', this.dateFormat);
     }
 }
