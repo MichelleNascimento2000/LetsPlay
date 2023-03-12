@@ -194,7 +194,42 @@
 		</ion-grid>
 	</ion-item>
 
+    <!-- Mensagem de erro para quando a busca por nome ou filtro não traz nenhum resultado -->
 	<ion-item class="warning-item-style" *ngIf="!databaseService.hasLoadedGamesOnPage">
 		<ion-label class="warning-label-style" style="font-size: 20px;">Nenhum resultado encontrado!</ion-label>
 	</ion-item>
+
+	<div style="margin-bottom: 70px;"></div>
+	<ion-grid fixed slot="fixed" class="footer-page-numbering-style" style="bottom: 0px">
+		<ion-row>
+
+            <!-- Espaçamento -->
+			<ion-col size="2"></ion-col>
+
+            <!-- Voltar página -->
+			<ion-col size="2">
+				<ion-button (click)="databaseService.backPage()" class="back-forward-page-style">
+					<ion-icon slot="icon-only" name="arrow-back-circle"></ion-icon>
+				</ion-button>
+			</ion-col>
+
+            <!-- Página atual -->
+			<ion-col size="4">
+				<ion-card color="none" class="page-number-card-style">
+					<ion-label class="page-number-text-style">Página {{databaseService.currentPage}}</ion-label>
+				</ion-card>
+			</ion-col>
+
+            <!-- Próxima página -->
+			<ion-col size="2">
+				<ion-button (click)="databaseService.forwardPage()" class="back-forward-page-style">
+					<ion-icon slot="icon-only" name="arrow-forward-circle"></ion-icon>
+				</ion-button>
+			</ion-col>
+
+            <!-- Espaçamento -->
+			<ion-col size="2"></ion-col>
+
+		</ion-row>
+	</ion-grid>
 </ion-content>

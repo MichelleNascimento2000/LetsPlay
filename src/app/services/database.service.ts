@@ -3,7 +3,7 @@ import { environment } from 'src/environments/environment';
 import { Storage } from '@ionic/storage';
 import axios from "axios";
 import { APIGame, Game, Genre, Platform, Company } from '../models/API-Models';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +13,8 @@ export class DatabaseService {
     constructor(
 		public storage          : Storage,
 		public loadingController: LoadingController,
-		public alertController  : AlertController
+		public alertController  : AlertController,
+        public toastController  : ToastController
     ){}
 
 
@@ -212,7 +213,8 @@ export class DatabaseService {
         this.resetSearch();
         this.assignFormattedInputName();
         this.resetDataIDParam();
-        
+        this.resetPages();
+
         this.getGamesFromAPI(
             this.getBuiltQueryURL()
         );
@@ -414,5 +416,52 @@ export class DatabaseService {
         dateOfGame.setDate(dateOfGame.getDate() + 1);
 
         return 	dateOfGame.toLocaleDateString('pt-BR', this.dateFormat);
+    }
+
+    //  Ir para próxima página
+    public forwardPage(){        
+        if(this.hasReachedMaxPages){
+            this.showErrorToast('Nenhum resultado encontrado!');
+            return;
+        }
+
+        this.currentPage++;
+        this.loadMore();
+    }
+
+    //  Ir para página anterior
+    public backPage(){
+        if(this.currentPage > 1){
+            this.currentPage--;
+        }
+    }
+
+    //  Carregar próxima pagina de itens
+    public loadMore(): void{
+        if(!this.builtGamesToShowMap.get(this.currentPage)){
+            this.resetDataIDParam();
+            this.pageIndexParam++;
+
+            this.getGamesFromAPI(
+                this.getBuiltQueryURL()
+            );
+        }
+    }
+
+    //  Voltar página para a primeira  
+    public resetPages(){
+        this.currentPage = 1;
+    }
+
+    //  Exibir toast com erro
+    public async showErrorToast(messageToShow: string){
+        const toast = await this.toastController.create({
+            cssClass: 'error-toast-style',
+            position: 'top',
+            message : messageToShow,
+            duration: 1500,
+            animated: true
+        });
+        toast.present();
     }
 }

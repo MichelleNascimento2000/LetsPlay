@@ -147,6 +147,40 @@
     --background: #6c1313cd;
 }
 
+//  Paginação - Item que contém a navegação por páginas
+.footer-page-numbering-style{
+    background-color: var(--dark-purple); 
+    position: absolute; 
+    bottom: 50px;
+}
+
+//  Paginação - Elementos para ir e voltar das páginas
+.back-forward-page-style{
+    --background: rgb(11, 2, 19, 0);
+}
+
+//  Paginação - Card com o número da página atual
+.page-number-card-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 100;
+    font-size: 16px;
+    margin: 0px;
+    padding: 0px;
+    height: 40px;
+    text-align: center;
+}
+
+//  Paginação - Estilo do texto da página atual
+.page-number-text-style{
+    color: #FFFFFF;
+    
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 //  Estilo do elemento de Loading
 .loading-info-style{
     --background: #1E0230;
@@ -170,4 +204,12 @@
         color: #ce4e4e;
         font-size: 15px;
     }
+}
+
+//  Estilo do toast exibido em caso de erro
+.error-toast-style {
+    --background: rgb(142, 11, 11);
+    font-family: "Londrina Solid", cursive;
+    color: #ffffff;
+    font-size: 15px;
 }

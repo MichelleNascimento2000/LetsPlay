@@ -75,6 +75,7 @@ export class FiltersService {
         ['Nota',               {'valid': true, 'message': ''}],
         ['Data de lançamento', {'valid': true, 'message': ''}]
     ]);
+    
 
     //  Variável para recebre input do usuário para busca de filtros pelo nome
 	public searchValue: string;
@@ -203,6 +204,7 @@ export class FiltersService {
 
     //  Aplicar fitros e buscar jogos correspondentes
 	public async searchGames(filterName: string){
+		this.databaseService.resetPages();
 		this.databaseService.resetShownGameplays();
         this.databaseService.resetHasReachedMaxPages();
         this.databaseService.resetDataIDParam();

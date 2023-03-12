@@ -20,8 +20,10 @@ export class SearchPage implements OnInit {
 		public router          : Router
 	){}
 
-	ngOnInit(){}
-    
+	ngOnInit(){
+		this.databaseService.resetPages();
+	}
+
     //  Enum com os valores dos demais filtros a serem utilizados
 	public filtersEnum = Filters;
     
