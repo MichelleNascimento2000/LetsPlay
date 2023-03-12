@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Storage } from '@ionic/storage';
 import axios from "axios";
-import { APIGame, Game, Genre, Platform } from '../models/API-Models';
+import { APIGame, Game, Genre, Platform, Company } from '../models/API-Models';
 import { AlertController, LoadingController } from '@ionic/angular';
 
 @Injectable({
@@ -41,6 +41,9 @@ export class DatabaseService {
 	public currentWhere       = '';
     public formattedInputName = '';
     public inputName;
+
+    //  Variável para guardar as empresas buscadas durante seleção de filtro
+    public searchedCompanies: Company[] = [];
     
     //  Variáveis para controle de paginação
     public currentPage: number = 1;
@@ -365,6 +368,40 @@ export class DatabaseService {
 
         this.allPlatforms = [];
 		this.allPlatforms.push(...returnedPlatforms);
+	}
+
+    // COMPANIES - Carregar os filtros
+	public async getCompaniesFromAPIForFilter(name: string){
+        let url = 
+            'https://api.rawg.io/api/developers?key=' + 
+            this.getStageFromName() + 
+            '&page_size=20&page=1' +
+            ((name != null && name != undefined) ? ('&search=' + name.replaceAll(' ', '%20')) : '');
+            
+        let returnedCompanies;
+        try{
+
+            returnedCompanies = (await axios.get(url)).data;
+            
+            if(returnedCompanies.count == 1){
+                returnedCompanies.push({
+                    id  : returnedCompanies.results[0].id,
+                    name: returnedCompanies.results[0].name
+                })
+            } else {
+                returnedCompanies = returnedCompanies.results
+                .map(rawData => (
+                    {
+                        id  : rawData.id,
+                        name: rawData.name
+                    }
+                ));
+            }
+		}catch(error){
+            this.showErrorAlert(error);
+		}
+        this.searchedCompanies = [];
+        await this.searchedCompanies.push(...returnedCompanies);
 	}
 
     //  Método para formatar a data para o formato DD/MM/YYYY

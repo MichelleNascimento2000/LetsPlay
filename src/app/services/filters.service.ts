@@ -59,6 +59,22 @@ export class FiltersService {
         		this.allCurrentOptions = this.buildFilterOptions(currentOptions, currentAPIValues);
 			    this.setOptionsToShow(currentOptions);
                 break;
+
+            case Filters.Empresas:
+                const selectedCompanyOptions: FilterOption[] = currentOptions.filter(option => option.selected);                
+                if(selectedCompanyOptions.length == 0){
+
+                    //  Buscar dinamicamente devido a volume
+                    await this.databaseService.getCompaniesFromAPIForFilter(null);
+
+                    this.buildFilterOptions(currentOptions, this.databaseService.searchedCompanies);
+                    this.setOptionsToShow(currentOptions);
+                } else {
+
+                    //  Exibir apenas opções selecionadas caso existam
+                    this.setOptionsToShow(selectedCompanyOptions);
+                }
+                break;
 		}
 	}
 
@@ -115,7 +131,13 @@ export class FiltersService {
 
         this.setPreselected();
         
-        allIdsArray.push(...this.allCurrentOptions.filter(option => option.preSelected).map(option => option.value));
+        //  Para o filtro de Empresas, buscar pelas opções carregadas em tempo de execução
+        //  Para as demais, buscar por todas as opções presentes
+        if(filterName == Filters.Empresas){
+            allIdsArray.push(...this.optionsToShow.filter(option => option.preSelected).map(option => option.value));
+        } else {
+            allIdsArray.push(...this.allCurrentOptions.filter(option => option.preSelected).map(option => option.value));
+        }
         allIdsQuery = allIdsArray.join(',');
         
 		if(!this.isResettingFilters){
@@ -125,6 +147,7 @@ export class FiltersService {
             switch (filterName) {
                 case Filters.Generos:
                 case Filters.Plataformas:
+                case Filters.Empresas:
 
                     //  Concatenar com termo de filtro da categoria específica, e com os IDs
                     currentFilterParams.query = allIdsQuery != '' ? (currentParam + allIdsQuery) : '';
@@ -213,32 +236,62 @@ export class FiltersService {
         //  Limpar opções sendo mostradas atualmente
         this.resetOptionsToShow(filterName);
 
-        const searchTerm = this.searchValue.toUpperCase();
-        
-        //  Busca por opções que contenham o input digitado pelo usuário
-        //  Filtra todas as opções atualmente carregadas e que ainda não foram selecionadas
-        const matchingOptions = this.allCurrentOptions.filter(option => (
-            !option.selected &&
-            option.name.toUpperCase().includes(searchTerm)
-        ));
+        if (filterName !== Filters.Empresas) {
 
-        // Busca uma correspondência exata entre as opções não selecionadas
-        const exactMatch = matchingOptions.find(option => option.name.toUpperCase() === searchTerm);
+            const searchTerm = this.searchValue.toUpperCase();
+            
+            //  Busca por opções que contenham o input digitado pelo usuário
+            //  Filtra todas as opções atualmente carregadas e que ainda não foram selecionadas
+            const matchingOptions = this.allCurrentOptions.filter(option => (
+                !option.selected &&
+                option.name.toUpperCase().includes(searchTerm)
+            ));
 
-        // Adiciona a correspondência exata, se existir, no topo da lista de opções a serem exibidas
-        if (Boolean(exactMatch)) {
-            this.optionsToShow.push(exactMatch);
+            // Busca uma correspondência exata entre as opções não selecionadas
+            const exactMatch = matchingOptions.find(option => option.name.toUpperCase() === searchTerm);
 
-            // Remove o item da lista com os demais
-            matchingOptions.splice(matchingOptions.indexOf(exactMatch), 1);
+            // Adiciona a correspondência exata, se existir, no topo da lista de opções a serem exibidas
+            if (Boolean(exactMatch)) {
+                this.optionsToShow.push(exactMatch);
+
+                // Remove o item da lista com os demais
+                matchingOptions.splice(matchingOptions.indexOf(exactMatch), 1);
+            }
+
+            // Ordena as opções por nome
+            matchingOptions.sort((a, b) => a.name.localeCompare(b.name));
+
+            // Adiciona as primeiras 9 opções restantes à lista de opções a serem exibidas
+            this.optionsToShow.push(...matchingOptions.slice(0, 9));
+
+        } else {
+
+            //  A busca por empresas deve ser dinâmica devido ao volume
+            await this.databaseService.getCompaniesFromAPIForFilter(this.searchValue);
+            
+            for(const company of this.databaseService.searchedCompanies){
+                const opt: FilterOption = {
+                    preSelected: false,
+                    selected   : false,
+                    name       : company.name,
+                    value      : company.id
+                };
+                
+                //  Empresas buscadas e registradas desde a abertura do app
+                const options = this.filterOptionsParamsMap.get(Filters.Empresas).options;
+
+                //  Para cada empresa da API encontrada, se a lista de todas não possuir, deve adicionar
+                if(!options.find(option => option.name.includes(company.name))){
+                    options.push(opt);
+                }
+
+                //  Adicionar apenas opções que não estejam dentre as já selecionadas, pois estas estão fixadas no topo da exibição
+                if(!options.find(option => option.name.includes(company.name)).selected){
+                    this.optionsToShow.push(opt);
+                }
+            }
         }
-
-        // Ordena as opções por nome
-        matchingOptions.sort((a, b) => a.name.localeCompare(b.name));
-
-        // Adiciona as primeiras 9 opções restantes à lista de opções a serem exibidas
-        this.optionsToShow.push(...matchingOptions.slice(0, 9));
-
+        
         this.hasFoundValue = !!this.optionsToShow.length;
 	}
 
@@ -252,7 +305,8 @@ export class FiltersService {
 	public isFilterWordList(filterName: string){
 		return [
 			'Gêneros',
-			'Plataformas'
+			'Plataformas',
+			'Empresas'
 		].includes(filterName);
 	}
 }
