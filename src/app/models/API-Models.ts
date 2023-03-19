@@ -1,15 +1,15 @@
 //  API - Jogo
 export interface APIGame{
-    id              : number;
-    name            : string;
-    background_image: string;
-    metacritic      : number;
-    platforms       : APIPlatform[];
-    genres          : APIGenre[];
-    developers      : APIDeveloper[];
-    esrb_rating     : APIESRBRating;
-    description_raw : string;
-    released        : string;
+    id              : number;           //  Id do jogo na API
+    name            : string;           //  Nome
+    background_image: string;           //  Imagem
+    metacritic      : number;           //  Nota
+    platforms       : APIPlatform[];    //  Plataformas
+    genres          : APIGenre[];       //  Gêneros
+    developers      : APIDeveloper[];   //  Empresas
+    esrb_rating     : APIESRBRating;    //  Faixa etária
+    description_raw : string;           //  Descrição
+    released        : string;           //  Data de lançamento
 }
 
 //  API - Plataforma
@@ -83,11 +83,11 @@ export interface FilterOption{
 
 //  Aplicação - Parâmetros dos filtros
 export interface FilterOptionsParams {
-    options    ?: FilterOption[];
-    query       : string;
-    useFilter  ?: boolean;
-    concatParam : string;
-    apiValues  ?: any[];
+    options    ?: FilterOption[];   //  Opções, caso seja aplicável
+    query       : string;           //  Query a ser aplicada na busca pr esse filtro
+    useFilter  ?: boolean;          //  Controle para usar ou não o filtro
+    concatParam : string;           //  Texto do parâmetro de busca na query
+    apiValues  ?: any[];            //  Valores das opções trazidos pela API
 }
 
 //  Aplicação - Enum de cada filtro

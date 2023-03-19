@@ -15,21 +15,21 @@
 		<ion-row>
 			<ion-col size="6">
                 <!-- Imagem de capa -->
-				<ion-img [src]="gameToShow.coverURL" class="cover-style" style="height: 200px; width: 200px; border-width: 5px;"></ion-img>
+				<ion-img [src]="game_to_show.coverURL" class="cover-style" style="height: 200px; width: 200px; border-width: 5px;"></ion-img>
 				
                 <ion-row>
 
                     <!-- Nota -->
 					<ion-col size="5">
 						<ion-card class="rating-card-style">
-							<ion-text>{{gameToShow.rating}}<br></ion-text>
+							<ion-text>{{game_to_show.rating}}<br></ion-text>
 						</ion-card>
 					</ion-col>
 
                     <!-- Data de lançamento -->
 					<ion-col size="7">
 						<ion-card class="date-card-style">
-							<ion-text>{{gameToShow.releaseDate}}<br></ion-text>
+							<ion-text>{{game_to_show.releaseDate}}<br></ion-text>
 						</ion-card>
 					</ion-col>
 
@@ -40,7 +40,7 @@
                     <!-- Classificação Etária -->
 					<ion-col size="12">
 						<ion-card class="agerating-card-style">
-							<ion-text>{{gameToShow.ageRating}}<br></ion-text>
+							<ion-text>{{game_to_show.ageRating}}<br></ion-text>
 						</ion-card>
 					</ion-col>
 				</ion-row>
@@ -52,7 +52,7 @@
                     <!-- Nome -->
 					<ion-col size="12">
 						<ion-card class="name-card-style">
-							<ion-text>{{gameToShow.name}} <br></ion-text>
+							<ion-text>{{game_to_show.name}} <br></ion-text>
 						</ion-card>
 					</ion-col>
 
@@ -63,7 +63,7 @@
                     <!-- Gêneros -->
 					<ion-col size="12">
 						<ion-card class="genre-card-style" style="font-size: 16px;">
-							<ion-text *ngFor="let genre of gameToShow.genres">> {{genre}}<br></ion-text>
+							<ion-text *ngFor="let genre of game_to_show.genres">> {{genre}}<br></ion-text>
 						</ion-card>
 					</ion-col>
 
@@ -74,7 +74,7 @@
                     <!-- Plataformas -->
 					<ion-col size="12">
 						<ion-card class="platform-card-style" style="font-size: 16px;">
-							<ion-text *ngFor="let platform of gameToShow.platforms">* {{platform}}<br></ion-text>
+							<ion-text *ngFor="let platform of game_to_show.platforms">* {{platform}}<br></ion-text>
 						</ion-card>
 					</ion-col>
 
@@ -85,7 +85,7 @@
                     <!-- Empresas -->
 					<ion-col size="12">
 						<ion-card class="company-card-style" style="font-size: 16px;">
-							<ion-text *ngFor="let company of gameToShow.companies">- {{company}}<br></ion-text>
+							<ion-text *ngFor="let company of game_to_show.companies">- {{company}}<br></ion-text>
 						</ion-card>
 					</ion-col>
 
@@ -117,7 +117,7 @@
 		</ion-row>
 
         <!-- Descrição do jogo -->
-		<ion-row *ngIf="gameToShow.description != null">
+		<ion-row *ngIf="game_to_show.description != null">
 			<ion-col size="4">
 				<ion-card class="title-description-card-style">
 					<ion-text>Descrição<br></ion-text>
@@ -127,7 +127,7 @@
 		<ion-row style="margin-bottom: 100px;">
 			<ion-col size="12">
 				<ion-card class="description-card-style">
-					<ion-text *ngIf="gameToShow.description != null; else noDescription">{{gameToShow.description}}<br></ion-text>
+					<ion-text *ngIf="game_to_show.description != null; else noDescription">{{game_to_show.description}}<br></ion-text>
 					<ng-template #noDescription>
 						<ion-text>Sem descrição registrada<br></ion-text>
 					</ng-template>

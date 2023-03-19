@@ -1,7 +1,7 @@
 <!-- Menu lateral -->
 <ion-menu contentId="menu-content" menuId="main-menu" side="start" type="overlay">
 	<ion-content class="menu-background-style">
-        
+                
         <!-- Retornar para a home page -->
 		<ion-item routerLink='/home' class="menu-item-home-style">
 			<ion-icon slot="start" name="home" class="menu-icon-style"></ion-icon>
@@ -13,17 +13,17 @@
 
         <!-- Redirecionar para a página de gameplays -->
 		<ion-item class="menu-item-filter-style" style="margin-top: 0px;">
-			<ion-icon slot="start" name="game-controller" class="menu-icon-style"></ion-icon>
+            <ion-icon slot="start" name="game-controller" class="menu-icon-style"></ion-icon>
 			<ion-label class="menu-label-style">Jogatinas</ion-label>
 		</ion-item>
 
         <ion-item class="menu-separator-style"></ion-item>
 
         <!-- Seleção de filtros a serem usados na pesquisa de jogos -->
-        <ion-accordion-group>
-            <ion-accordion value="filters">
-                <ion-item slot="header" class="menu-item-filter-style">
-                    <ion-icon slot="start" name="funnel" class="menu-icon-style"></ion-icon>
+		<ion-accordion-group>
+			<ion-accordion value="filters">
+				<ion-item slot="header" class="menu-item-filter-style">
+					<ion-icon slot="start" name="funnel" class="menu-icon-style"></ion-icon>
                     <ion-label class="menu-label-style">Filtros</ion-label>
                 </ion-item>
 
@@ -57,8 +57,8 @@
 					</ion-row>
                     
 				</ion-list>
-            </ion-accordion>
-        </ion-accordion-group>
+			</ion-accordion>
+		</ion-accordion-group>
 	</ion-content>
 </ion-menu>
 <ion-router-outlet id="menu-content"></ion-router-outlet>
@@ -188,7 +188,6 @@
 							</ion-card>
 						</ion-col>
 					</ion-row>
-                    
 				</ion-col>
 			</ion-row>
 		</ion-grid>

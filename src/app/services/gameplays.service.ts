@@ -10,6 +10,7 @@ export class GameplaysService {
 		private router: Router
 	){}
 
+    //  Redireciona para página de detalhes do jogo selecionado
 	public redirectToGameDetails(gameId: number){
 		this.router.navigate(['game-searching/' + gameId]);
 	}

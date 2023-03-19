@@ -10,13 +10,13 @@ import { FilterPage } from './filter.page';
 import { ComponentsModule } from '../components/components.module';
 
 @NgModule({
-    imports: [
-        CommonModule,
-        FormsModule,
-        IonicModule,
-        FilterPageRoutingModule,
+	imports: [
+		CommonModule,
+		FormsModule,
+		IonicModule,
+		FilterPageRoutingModule,
 		ComponentsModule
-    ],
-    declarations: [FilterPage]
+	],
+	declarations: [FilterPage]
 })
 export class FilterPageModule { }

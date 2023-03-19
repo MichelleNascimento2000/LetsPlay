@@ -9,7 +9,7 @@ import { GameplaysService } from 'src/app/services/gameplays.service';
 })
 export class GameDetailsComponent implements OnInit {
 
-	@Input() gameToShow: Game;
+	@Input() game_to_show: Game;
 	
 	constructor(
 		public gameplaysService: GameplaysService

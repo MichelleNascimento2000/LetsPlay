@@ -95,6 +95,48 @@ export class FiltersService {
         return this.filterOptionsParamsMap.get(filterName as Filters);
     }
 
+    //  Popular Map de parametrizações dos filtros
+    public populateFiltersOptionsMap(){
+        this.filterOptionsParamsMap = new Map<Filters, FilterOptionsParams>([
+            [Filters.Generos,
+                {
+                    query: '',
+                    concatParam: '&genres=',
+                    options: [],
+                    apiValues: this.databaseService.allGenres
+                }
+            ],
+            [Filters.Plataformas,
+                {
+                    query: '',
+                    concatParam: '&platforms=',
+                    options: [],
+                    apiValues: this.databaseService.allPlatforms
+                }
+            ],
+            [Filters.Empresas,
+                {
+                    query: '',
+                    concatParam: '&developers=',
+                    options: []
+                }
+            ],
+            [Filters.Nota,
+                {
+                    query: '',
+                    concatParam: '&metacritic=',
+                    useFilter: false
+                }
+            ],
+            [Filters.DataLancamento,
+                {
+                    query: '',
+                    concatParam: '&dates=',
+                    useFilter: false
+                }
+            ]
+        ]);
+    }
 
     //  Iniciar página de filtros
 	public async startFiltersPage(filterName: string){

@@ -4,9 +4,9 @@ import { DatabaseService } from '../services/database.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-    selector: 'app-game-searching',
-    templateUrl: './game-searching.page.html',
-    styleUrls: ['./game-searching.page.scss'],
+	selector: 'app-game-searching',
+	templateUrl: './game-searching.page.html',
+	styleUrls: ['./game-searching.page.scss'],
 })
 export class GameSearchingPage implements OnInit {
 
@@ -19,10 +19,10 @@ export class GameSearchingPage implements OnInit {
 			builtGame => builtGame.id == +this.idValue
 		);
 	}
-    
-    ngOnInit(){}
+
+	ngOnInit(){}
 
     //  ID do jogo, que é passado como parâmetro na URL
-    public idValue = this.route.snapshot.paramMap.get('id');
+	public idValue = this.route.snapshot.paramMap.get('id');
 	public game: Game;
 }

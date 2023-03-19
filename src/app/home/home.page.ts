@@ -4,35 +4,33 @@ import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { DatabaseService } from '../services/database.service';
 import { FiltersService } from '../services/filters.service';
-import { FilterOptionsParams, Filters } from '../models/API-Models';
-
 
 @Component({
-    selector: 'app-home',
-    templateUrl: 'home.page.html',
-    styleUrls: ['home.page.scss'],
+	selector: 'app-home',
+	templateUrl: 'home.page.html',
+	styleUrls: ['home.page.scss'],
 })
 
 export class HomePage {
-    constructor(
+	constructor(
         public router           : Router,
         public databaseService  : DatabaseService,
         public loadingController: LoadingController,
 		public storage          : Storage,
         public filtersService   : FiltersService
-    ){}
+	){}
 
-    async ngOnInit(){
+	async ngOnInit(){
         
         //  Evitar recursão de execução mais de uma vez do OnInit
-		if(!this.databaseService.haveAppOpened){ 
+		if(!this.databaseService.haveAppOpened){
 			await this.createLoading('Aguarde...');
 			this.presentLoading();
 
             //  Recuperar da API informações dos gêneros e plataformas
             await this.databaseService.getAllGenresFromAPI();
             await this.databaseService.getAllPlatformsFromAPI();
-            
+
             //  Atribuir o número máximo de registros de jogos a ser pesquisado por vez na API
             this.databaseService.pageSizeCountParam = 10;
             
@@ -45,46 +43,8 @@ export class HomePage {
 			this.dismissLoading();
 		}
 
-        //  Ao iniciar aplicação, popular Map com as parametrizações dos filtros
-        this.filtersService.filterOptionsParamsMap = new Map<Filters, FilterOptionsParams>([
-            [Filters.Generos,
-                {
-                    query: '',
-                    concatParam: '&genres=',
-                    options: [],
-                    apiValues: this.databaseService.allGenres
-                }
-            ],
-            [Filters.Plataformas,
-                {
-                    query: '',
-                    concatParam: '&platforms=',
-                    options: [],
-                    apiValues: this.databaseService.allPlatforms
-                }
-            ],
-            [Filters.Empresas,
-                {
-                    query: '',
-                    concatParam: '&developers=',
-                    options: []
-                }
-            ],
-            [Filters.Nota,
-                {
-                    query: '',
-                    concatParam: '&metacritic=',
-                    useFilter: false
-                }
-            ],
-            [Filters.DataLancamento,
-                {
-                    query: '',
-                    concatParam: '&dates=',
-                    useFilter: false
-                }
-            ]
-        ]);
+        //  Popular Map com as parametrizações dos filtros
+        this.filtersService.populateFiltersOptionsMap();
 	}
 
     //  Redirecionar para a página de busca de jogos
@@ -98,8 +58,9 @@ export class HomePage {
 
 
     //  Métodos para elemento de loading
-    public loading: HTMLIonLoadingElement;
-    
+	public loading: HTMLIonLoadingElement;
+
+    //  Criar o loading
 	public async createLoading(messageToShow: string){
 		this.loading = await this.loadingController.create({
 			message : messageToShow,
@@ -107,10 +68,12 @@ export class HomePage {
 		});
 	}
 
+    //  Fechar o loading
 	public async dismissLoading(){
 		this.loading.dismiss();
 	}
 
+    //  Mostrar o loading
 	public async presentLoading(){
 		await this.loading.present();
 	}
