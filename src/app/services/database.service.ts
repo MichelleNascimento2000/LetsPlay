@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Storage } from '@ionic/storage';
+import { Router } from '@angular/router';
 import axios from "axios";
 import { APIGame, Game, Genre, Platform, Company } from '../models/API-Models';
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
@@ -12,6 +13,7 @@ export class DatabaseService {
 
     constructor(
 		public storage          : Storage,
+		public router           : Router,
 		public loadingController: LoadingController,
 		public alertController  : AlertController,
         public toastController  : ToastController
@@ -55,6 +57,16 @@ export class DatabaseService {
 		month: '2-digit',
 		year : 'numeric'
 	}
+
+    //  Variável com os parâmetros para formatação de data
+	public dateTimeFormat: Intl.DateTimeFormatOptions = {
+		hour  : '2-digit',
+		minute: '2-digit',
+		second: '2-digit',
+		day   : '2-digit',
+		month : '2-digit',
+		year  : 'numeric'
+	};
 
     //  Variáveis para armazenar infos relacionadas aos jogos
 	public allGenres   : Genre[]    = [];
@@ -187,6 +199,11 @@ export class DatabaseService {
 
 		this.dismissLoading();
 	}
+
+    //  Redireciona para página de detalhes do jogo selecionado
+	public redirectToGameDetails(gameId: number){
+		this.router.navigate(['game-searching/' + gameId]);
+    }
 
     //  Exibir alert com erros de API
     public async showErrorAlert(error){
@@ -421,7 +438,7 @@ export class DatabaseService {
     //  Ir para próxima página
     public forwardPage(){        
         if(this.hasReachedMaxPages){
-            this.showErrorToast('Nenhum resultado encontrado!');
+            this.showSuccessErrorToast(false, 'Nenhum resultado encontrado!');
             return;
         }
 
@@ -453,15 +470,22 @@ export class DatabaseService {
         this.currentPage = 1;
     }
 
-    //  Exibir toast com erro
-    public async showErrorToast(messageToShow: string){
+    //  Exibir toast de Sucesso ou Erro
+    public async showSuccessErrorToast(isSuccess: boolean, messageToShow: string){
         const toast = await this.toastController.create({
-            cssClass: 'error-toast-style',
-            position: 'top',
-            message : messageToShow,
-            duration: 1500,
-            animated: true
-        });
-        toast.present();
+			cssClass: isSuccess ? 'success-toast-style' : 'error-toast-style',
+			position: 'bottom',
+			message : messageToShow,
+			animated: true,
+			duration: isSuccess ? 3000 : 100000,
+            buttons: [
+                {
+                    text: 'Fechar',
+                    role: 'cancel',
+                    handler: () => {}
+                }
+            ]
+		});
+		toast.present();
     }
 }

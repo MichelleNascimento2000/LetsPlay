@@ -90,6 +90,21 @@ export interface FilterOptionsParams {
     apiValues  ?: any[];            //  Valores das opções trazidos pela API
 }
 
+//  Aplicação - Gameplay
+export interface Gameplay{
+    gameId                : number; //  ID do jogo na API
+    gameName              : string; //  Nome
+    gameCoverURL          : string; //  Imagem
+    name                  : string; //  Título da gameplay
+    addingDate            : string; //  Data de criação
+    lastModifiedDateString: string; //  String com data da última modificação
+    lastModifiedDate      : Date;   //  Valor com data da última modificação
+    oldStatus             : string; //  Status antigo (auxiliar para operação de alteração)
+    status                : string; //  Status atual
+    stagesCreated         : number; //  Quantidade de fases criadas
+    notes                 : string; //  Anotações
+}
+
 //  Aplicação - Enum de cada filtro
 export enum Filters {
     Generos        = 'Gêneros',
@@ -97,4 +112,12 @@ export enum Filters {
     Empresas       = 'Empresas',
     Nota           = 'Nota',
     DataLancamento = 'Data de lançamento'
+}
+
+//  Aplicação - Enum de cada possível status de gameplay
+export enum GameplayStatusOptions {
+    NaLista   = 'Na lista',
+    Pausado   = 'Pausado',
+    Jogando   = 'Jogando',
+    Concluido = 'Concluído'
 }
