@@ -181,11 +181,87 @@
     transform: translate(-50%, -50%);
 }
 
+//  Gameplays - Estilo do rodapé com tabs de filtragem
+.footer-tab-bar-style{
+    --background: var(--dark-purple);
+}
+
+//  Gameplays - Estilo do filtro selecionado
+.footer-tab-button-selected-style{
+    font-family: "Londrina Solid", cursive;
+    font-size: 15px;
+    
+	--background: var(--dark-purple);
+    --color: #c6c258;
+}
+
+//  Gameplays - Estilo do filtro não selecionado
+.footer-tab-button-unselected-style{
+    font-family: "Londrina Solid", cursive;
+    font-size: 15px;
+    
+	--background: var(--dark-purple);
+    --color: #9882c7;
+}
+
+//  Gameplays - Card para aviso quando não há gameplays para carregar
+.no-loaded-gameplays-card-style{
+    margin-left: 40%;
+    margin-right: 40%;
+    margin-top: 15px;
+    padding: 5px;
+    text-align: center;
+
+    --background: #e46f2b4c;
+}
+
+//  Gameplays - Texto do aviso quando não há gameplays para carregar
+.no-loaded-gameplays-text-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 400;
+    font-size: 25px;
+    
+    color: #3a1900;
+}
+
 //  Estilo do elemento de Loading
 .loading-info-style{
     --background: #1E0230;
     color: rgba(221, 221, 221, 0.756);
     font-family: "Londrina Solid", cursive;
+}
+
+//  Estilo dos elementos de Alert
+.base-alert-style {
+    --background: #1e0230;
+    font-family: "Londrina Solid", cursive;
+
+    //  Botões de OK e CANCELAR
+    button {
+        color: rgb(225, 66, 249) !important;
+        font-size: 17px !important;
+    }
+
+    //  Texto de input dentro do alert
+    .alert-input {
+        color: #8e729e;
+        font-size: 15px;
+    }
+
+    //  Textos de exibição
+    .alert-message {
+        color: #8e729e;
+        font-size: 20px;
+    }
+}
+
+//  Lista de opções dentro do Alert - Estilo de opção selecionada
+.base-alert-style [aria-checked="true"] .alert-radio-label.sc-ion-alert-md{
+    color: #c2aecd;
+}
+//  Lista de opções dentro do Alert - Estilo de opção não selecionada
+.base-alert-style [aria-checked="false"] .alert-radio-label.sc-ion-alert-md{
+    color: #c2aecd;
 }
 
 //  Estilo do alert exibido em caso de erro da API
@@ -209,6 +285,14 @@
 //  Estilo do toast exibido em caso de erro
 .error-toast-style {
     --background: rgb(142, 11, 11);
+    font-family: "Londrina Solid", cursive;
+    color: #ffffff;
+    font-size: 15px;
+}
+
+//  Estilo do toast exibido em caso de sucesso
+.success-toast-style {
+    --background: rgb(11, 142, 52);
     font-family: "Londrina Solid", cursive;
     color: #ffffff;
     font-size: 15px;

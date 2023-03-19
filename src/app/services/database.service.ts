@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import axios from "axios";
 import { APIGame, Game, Genre, Platform, Company } from '../models/API-Models';
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { KeyValue } from '@angular/common';
 
 @Injectable({
     providedIn: 'root'
@@ -487,5 +488,12 @@ export class DatabaseService {
             ]
 		});
 		toast.present();
+    }
+
+
+    //  Método para passar como parâmetro no pipe do keyValue das iterações que envolvam Enum
+    //  Exibe os valores na ordem inserida na classe Enum
+    public originalOrder = (a: KeyValue<string, string>, b: KeyValue<string, string>): number => {
+        return 0;
     }
 }

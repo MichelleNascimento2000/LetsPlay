@@ -1,0 +1,14 @@
+<ion-tabs>
+	<ion-tab-bar class="footer-tab-bar-style" slot="bottom">
+
+        <!-- Iterar sobre os status da gameplay para exibir as tabs de filtragem -->
+        <ion-tab-button *ngFor="let filter of gameplaysService.gameplayStatusOptionsEnum | keyvalue: databaseService.originalOrder"
+            [class]="gameplaysService.isTabSelected(filter.value, gameplaysService.progressName) ? 
+                    'footer-tab-button-selected-style' : 'footer-tab-button-unselected-style'" 
+            (click)="gameplaysService.reassignProgressAndRepopulateGameplays(filter.value)"
+        >
+            <ion-img style="height: 23px;" [src]="'./assets/images/gameplays-' + filter.value + '.png'"></ion-img>
+            <ion-label>{{filter.value}}</ion-label>
+        </ion-tab-button>
+    </ion-tab-bar>
+</ion-tabs>

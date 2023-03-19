@@ -19,7 +19,23 @@ export class GameplaysService {
 
     //  Lista corrida com todas as gameplays do usuário
     public allGameplays: Gameplay[] = [];
+
+    //  Map com todas as gameplays do usuário organizadas, separadas por Status e número da página de exibição
+    public builtGameplaysToShowMap: Map<String, Gameplay[]> = new Map();
     
+    //  Map com as gameplays do usuário a serem exibidas, separadas por Status e número da página de exibição
+    public renderedBuiltGameplaysToShowMap: Map<String, Gameplay[]> = new Map();
+    
+    //  Enum com os valores dos possíveis status de gameplay para exibição das tabs
+    public gameplayStatusOptionsEnum = GameplayStatusOptions;
+    
+    //  Status atualmente sendo filtrado
+	public progressName: string = 'Jogando';
+
+    //  Variáveis de controle para parametrizar a função do botão de retornar da página de detalhes de um jogo
+    public comingFromSearch: Boolean = false;
+
+
    //  Exibe alert de confirmação de adição de gameplay, com mensagens diferentes caso o jogo já tenha sido previamente adicionado
    public async confirmGameAdding(game: Game) {
         let messageToShow: string =
@@ -163,15 +179,70 @@ export class GameplaysService {
         //  Salvar a lista de gameplays atualizadas no Storage
         this.saveGameplaysToStorage();
 
+        this.reassignProgressAndRepopulateGameplays(chosenStatus);
+
         //  Exibir Toast de sucesso
         this.databaseService.showSuccessErrorToast(true, 'Gameplay criada com sucesso!');
-
-        console.log(this.allGameplays);
     }
 
     //  Salvar lista de todas as gameplays no Storage
     //  Caso o parâmetro venha null, considerar a lista de todas as gameplays
     public saveGameplaysToStorage(){
 		this.storage.set('gameplays', this.allGameplays);
+	}
+
+    //  Retorna o atual conjunto de gameplays de acordo com o status filtrado e a página atual
+    public getCurrentGameplaySetToShow(){
+        return this.renderedBuiltGameplaysToShowMap.get(this.progressName);
+    }
+
+    //  Retorna se a tab passada por parâmetro é a que está selecionada atualmente
+    public isTabSelected(tabValue: string, chosenValue: string){
+        return tabValue == chosenValue;
+    }
+
+    //  Atualizar status de progresso atual, e reprocessar Map das gameplays
+	public reassignProgressAndRepopulateGameplays(progressName: string) {
+
+        //  Atualiza variável que guarda o progresso atual
+		this.progressName = progressName;
+
+        //  Carrega as gameplays a serem renderizadas
+		this.populateAllGameplaysToShowMap();
+	}
+
+    //  Popula o Map com todas as gameplays do usuário, e carrega o Map de exibição na tela filtrando por status e página
+    public populateAllGameplaysToShowMap(){
+
+        //  Iterar por todos os status possiveis
+        for(let status of Object.values(GameplayStatusOptions)){
+            
+            //  Resetar Map das gameplays paginadas
+            this.resetBuiltGameplaysMap(status);
+
+            //  Adicionar gameplays ao Map de exibição
+    		for(let gameplay of this.allGameplays.filter(gameplay => gameplay.status == status)){
+                this.builtGameplaysToShowMap.get(status).push(gameplay);
+            }
+            
+            //  Popular Map de gameplays a ser renderizada com o Map geral recém montado
+            this.renderedBuiltGameplaysToShowMap = new Map(this.builtGameplaysToShowMap);
+        }
+    }
+
+    //  Resetar o Map de organização das gameplays
+    public resetBuiltGameplaysMap(status: string){
+        this.builtGameplaysToShowMap.set(status, []);
+    }
+
+    //  Personalizar o retorno a partir da página de gameplays
+    //  Ela pode ser acessada a partir da Home ou a partir da página de Busca
+    public returnFromGameplaysPage(){
+        this.router.navigate(this.comingFromSearch ? ['search'] : ['home']);
+    }
+
+    //  Campo de controle para apontar qual é a página pela qual a página de gameplays foi acessada
+	public setComingFromSearch(comingFromSearch){
+		this.comingFromSearch = comingFromSearch;
 	}
 }

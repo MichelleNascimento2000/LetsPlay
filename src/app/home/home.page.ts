@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { DatabaseService } from '../services/database.service';
 import { FiltersService } from '../services/filters.service';
+import { GameplaysService } from '../services/gameplays.service';
 
 @Component({
 	selector: 'app-home',
@@ -13,11 +14,12 @@ import { FiltersService } from '../services/filters.service';
 
 export class HomePage {
 	constructor(
-        public router           : Router,
-        public databaseService  : DatabaseService,
-        public loadingController: LoadingController,
+		public router           : Router,
+		public databaseService  : DatabaseService,
+		public loadingController: LoadingController,
 		public storage          : Storage,
-        public filtersService   : FiltersService
+        public filtersService   : FiltersService,
+		public gameplaysService : GameplaysService
 	){}
 
 	async ngOnInit(){
@@ -30,6 +32,14 @@ export class HomePage {
             //  Recuperar da API informações dos gêneros e plataformas
             await this.databaseService.getAllGenresFromAPI();
             await this.databaseService.getAllPlatformsFromAPI();
+                
+            try{
+                await this.storage.get('gameplays').then(
+                    gameplay => this.gameplaysService.allGameplays.push(...gameplay)
+                );
+            } catch (error){}
+				
+            await this.gameplaysService.populateAllGameplaysToShowMap();
 
             //  Atribuir o número máximo de registros de jogos a ser pesquisado por vez na API
             this.databaseService.pageSizeCountParam = 10;
@@ -54,6 +64,8 @@ export class HomePage {
 
     //  Redirecionar para página de jogatinas
 	public redirectToMyGameplays(){
+		this.gameplaysService.setComingFromSearch(false);
+		this.router.navigate(['gameplays/playing-games']);
 	}
 
 

@@ -12,8 +12,8 @@
 		<ion-item class="menu-separator-style"></ion-item>
 
         <!-- Redirecionar para a página de gameplays -->
-		<ion-item class="menu-item-filter-style" style="margin-top: 0px;">
-            <ion-icon slot="start" name="game-controller" class="menu-icon-style"></ion-icon>
+		<ion-item routerLink='/gameplays/playing-games' (click)="gameplaysService.setComingFromSearch(true)" class="menu-item-filter-style" style="margin-top: 0px;">
+			<ion-icon slot="start" name="game-controller" class="menu-icon-style"></ion-icon>
 			<ion-label class="menu-label-style">Jogatinas</ion-label>
 		</ion-item>
 
