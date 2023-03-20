@@ -13,12 +13,19 @@ export class GameSearchingPage implements OnInit {
 	constructor(
 		private route           : ActivatedRoute,
 		private databaseService : DatabaseService
-	){
+    ){
         //  Busca na lista dos jogos carregados na página qual jogo carregar para exibição individual
-		this.game = [].concat(...this.databaseService.builtGamesToShowMap.values()).find(
-			builtGame => builtGame.id == +this.idValue
-		);
-	}
+        this.game = [].concat(...this.databaseService.builtGamesToShowMap.values()).find(
+            builtGame => builtGame.id == +this.idValue
+        );
+        
+        //  Se não encontrar na lista principal, busca pela lista exclusiva de jogos das gameplays existentes
+        if(this.game == null){
+            this.game = Array.from(this.databaseService.gameplayBuiltGames.values()).find(
+                builtGame => builtGame.id == +this.idValue
+            );
+        }
+    }
 
 	ngOnInit(){}
 

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Game, Gameplay, GameplayStatusOptions } from '../models/API-Models';
+import { APIGame, Game, Gameplay, GameplayStatusOptions } from '../models/API-Models';
 import { AlertController, AlertInput } from '@ionic/angular';
 import { DatabaseService } from './database.service';
 import { Storage } from '@ionic/storage';
+import axios from 'axios';
 
 @Injectable({
 	providedIn: 'root'
@@ -35,6 +36,31 @@ export class GameplaysService {
     //  Variáveis de controle para parametrizar a função do botão de retornar da página de detalhes de um jogo
     public comingFromSearch: Boolean = false;
 
+    //  Carregar informações dos jogos contidos dentre as gameplays salvas pelo usuário
+    public async getGameplaysInfoFromAPI(){
+        let gameplayGames: APIGame[] = [];
+        for(let gameplay of this.allGameplays){
+            this.databaseService.dataIDParam = '/' + gameplay.gameId;
+            let url = this.databaseService.getBuiltQueryURL();
+            
+            let returnedGame = (await axios.get(url, null)).data;
+            let game: APIGame = {
+                id              : returnedGame.id,
+                name            : returnedGame.name,
+                background_image: returnedGame.background_image,
+                metacritic      : returnedGame.metacritic,
+                platforms       : returnedGame.platforms.map(obj => ({ platform: obj.platform })),
+                genres          : returnedGame.genres.map(obj => ({id: obj.id, name: obj.name})),
+                esrb_rating     : returnedGame.esrb_rating,
+                released        : returnedGame.released,
+                description_raw : returnedGame.description_raw,
+                developers      : returnedGame.developers
+            }
+
+            await gameplayGames.push(game);
+        }
+        await this.databaseService.buildAppGames(gameplayGames, true);
+    }
 
    //  Exibe alert de confirmação de adição de gameplay, com mensagens diferentes caso o jogo já tenha sido previamente adicionado
    public async confirmGameAdding(game: Game) {
@@ -165,7 +191,6 @@ export class GameplaysService {
             gameCoverURL          : game.coverURL,
             name                  : gameplayName,
             addingDate            : now,
-            lastModifiedDateString: now,
             lastModifiedDate      : new Date(),
             oldStatus             : chosenStatus,
             status                : chosenStatus,
@@ -173,13 +198,14 @@ export class GameplaysService {
             notes                 : ''
         };
 
+        //  Adiciona jogo em questão no Map de jogos carregados via gameplays
+        this.databaseService.gameplayBuiltGames.set(game.id, game);
+
         //  Adiciona gameplay na lista de gameplays, e no topo de todas
         this.allGameplays.unshift(gameplay);
 
         //  Salvar a lista de gameplays atualizadas no Storage
         this.saveGameplaysToStorage();
-
-        this.reassignProgressAndRepopulateGameplays(chosenStatus);
 
         //  Exibir Toast de sucesso
         this.databaseService.showSuccessErrorToast(true, 'Gameplay criada com sucesso!');
@@ -190,6 +216,11 @@ export class GameplaysService {
     public saveGameplaysToStorage(){
 		this.storage.set('gameplays', this.allGameplays);
 	}
+
+    //  Resetar o Map de organização das gameplays
+    public resetBuiltGameplaysMap(status: string){
+        this.builtGameplaysToShowMap.set(status, []);
+    }
 
     //  Retorna o atual conjunto de gameplays de acordo com o status filtrado e a página atual
     public getCurrentGameplaySetToShow(){
@@ -230,10 +261,105 @@ export class GameplaysService {
         }
     }
 
-    //  Resetar o Map de organização das gameplays
-    public resetBuiltGameplaysMap(status: string){
-        this.builtGameplaysToShowMap.set(status, []);
+    //  Exibe mensagem de confirmação para mudança de status da gameplay
+    public async confirmGameStatusChange(game: Gameplay) {
+
+        //  Variáveis para controle do novo e do antigo status
+        let newStatus = game.status;
+        let oldStatus = game.oldStatus;
+
+        //  Em caso de confirmação, efetuar a mudança
+        const alert = await this.alertController.create({
+            cssClass: 'base-alert-style',
+            message: `Você deseja mesmo mudar esse jogo de "${game.oldStatus}" para "${game.status}"?`,
+            buttons: [
+                {
+                    text: 'Sim',
+                    handler: () => this.makeGameStatusChange(game, newStatus)
+                },
+                {
+                    text: 'Não'
+                }
+                
+            ]
+        });
+
+        //  Atribui status atual com o antigo, após a mudança automática efetuada pelo próprio picklist
+        //  O status não deve mudar antes da confirmação do usuário
+        game.status = oldStatus;
+
+        await alert.present();
     }
+
+
+    //  Efetuar troca de status da gameplay passada pelo novo status, também recebido
+    public makeGameStatusChange(game: Gameplay, newStatus: string){
+
+        //  O status antigo é o status cujas gameplays serão renderizadas na página após fim da operação
+        this.progressName = game.oldStatus;
+        
+        game.status    = newStatus;
+        game.oldStatus = game.status;
+        
+        //  Atualizar data da última modificação da gameplay
+        this.updateGameplayLastModifiedDate(game);
+
+        this.saveGameplaysToStorage();
+
+        this.databaseService.showSuccessErrorToast(true, 'Status da gameplay alterado com sucesso!');
+    }
+
+    //  Atualizar data da última modificação, e reordenar todas as gameplays com base nessa data
+	public updateGameplayLastModifiedDate(game: Gameplay){
+		game.lastModifiedDate = new Date();
+
+        //  Reordenação para exibir primeiro as modificadas mais recentemente
+		this.reorderGameplaysByDate();
+
+        //  Carregar as gameplays do status atual
+		this.reassignProgressAndRepopulateGameplays(this.progressName);
+
+        //  Atualizar lista de gameplays no Storage
+        this.saveGameplaysToStorage();
+	}
+
+    //  Reordenação das gameplays para inserir as com modificação mais recente primeiro
+    //  Aplicação do Bubble Sort
+	public reorderGameplaysByDate(){
+
+        //  Tamanho do array de gameplays
+		let length = this.allGameplays.length;
+
+        //  Controle para ordenação cessar
+		let isNotInOrder = true;
+
+		while(isNotInOrder){
+			isNotInOrder = false;
+
+            //  Do primeiro até o penúltimo
+			for(let i = 0; i < length - 1; i++){
+
+                //  Do segundo até o último
+				for(let j = i + 1; j < length; j++){
+
+                    //  Comparar se todos os pares de elementos possíveis precisam ser trocados de posição
+					if(this.allGameplays[i].lastModifiedDate < this.allGameplays[j].lastModifiedDate){
+
+                        //  Troca de posição
+						let auxI = this.allGameplays[i];
+						let auxJ = this.allGameplays[j];
+						this.allGameplays[i] = auxJ;
+						this.allGameplays[j] = auxI;
+
+                        //  Será necessário refazer a varredura mais uma vez para garantir a ordenação total
+						isNotInOrder = true;
+					}
+				}
+			}
+		}
+         
+		this.populateAllGameplaysToShowMap();
+	}
 
     //  Personalizar o retorno a partir da página de gameplays
     //  Ela pode ser acessada a partir da Home ou a partir da página de Busca

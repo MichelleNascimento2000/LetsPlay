@@ -297,3 +297,35 @@
     color: #ffffff;
     font-size: 15px;
 }
+
+//  Ion Select (games-by-progress) - Caixa inteira
+.alert-wrapper.sc-ion-alert-md {
+    --background: #1e0230;
+}
+
+//  Ion Select (games-by-progress) - Header
+.alert-title.sc-ion-alert-md{
+    font-family: "Londrina Solid", cursive;
+    color: #8e729e;
+}
+
+//  Ion Select (games-by-progress) - Opções selecionadas
+[aria-checked="true"].sc-ion-alert-md .alert-radio-label.sc-ion-alert-md{
+    font-family: "Londrina Solid", cursive;
+    color: #c2aecd;
+}
+
+//  Ion Select (games-by-progress) - Opções não selecionadas
+[aria-checked="false"].sc-ion-alert-md .alert-radio-label.sc-ion-alert-md{
+    font-family: "Londrina Solid", cursive;
+    color: #c2aecd;
+}
+
+//  Ion Select (games-by-progress) - Botões de OK e CANCELAR
+.alert-button-group.sc-ion-alert-md{
+    button {
+        font-family: "Londrina Solid", cursive;
+        color: rgb(225, 66, 249) !important;
+        font-size: 17px !important;
+    }
+}

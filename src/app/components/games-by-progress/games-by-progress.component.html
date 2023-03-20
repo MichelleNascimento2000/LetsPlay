@@ -63,6 +63,33 @@
 
 				</ion-col>
 
+
+				<ion-col size="8">
+					<ion-row>
+                        <ion-col size="12">
+
+                            <!-- Alteração do status da gameplay -->
+							<ion-item class="status-list-style">
+								<ion-label class="status-list-style">Status</ion-label>
+								<ion-select class="status-list-style" okText="OK" cancelText="Cancelar" multiple="false"
+                                            [(ngModel)]="gameplay.status" 
+                                            (ngModelChange)="gameplaysService.confirmGameStatusChange(gameplay)">
+									<ion-select-option class="status-list-label-style" *ngFor="let option of gameplaysService.gameplayStatusOptionsEnum | keyvalue: databaseService.originalOrder" [value]=option.value>{{option.value}}</ion-select-option>
+								</ion-select>
+							</ion-item>
+
+                            <!-- Espaçamento (que também redireciona para a gameplay) -->
+							<ion-item color="none" style="margin-bottom: 10px;"></ion-item>
+
+                            <!-- Redirecionar para informações do jogo -->
+							<ion-item class="game-info-style" (click)="databaseService.redirectToGameDetails(gameplay.gameId)">
+								<ion-icon name="information-circle" slot="start"></ion-icon>
+								<ion-label class="game-info-style">Info do jogo</ion-label>
+							</ion-item>
+
+						</ion-col>
+					</ion-row>
+				</ion-col>
 			</ion-row>
 
 		</ion-grid>

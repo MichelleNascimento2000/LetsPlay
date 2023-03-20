@@ -97,7 +97,6 @@ export interface Gameplay{
     gameCoverURL          : string; //  Imagem
     name                  : string; //  Título da gameplay
     addingDate            : string; //  Data de criação
-    lastModifiedDateString: string; //  String com data da última modificação
     lastModifiedDate      : Date;   //  Valor com data da última modificação
     oldStatus             : string; //  Status antigo (auxiliar para operação de alteração)
     status                : string; //  Status atual

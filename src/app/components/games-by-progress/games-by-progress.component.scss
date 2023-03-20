@@ -21,3 +21,27 @@
     --color: #6994BC;
     --background: #3D0461;
 }
+
+//  Item com lista dos status da gameplay
+.status-list-style{
+    --background: #3d046146;
+    font-family: "Londrina Solid", cursive;
+    font-size: 16px;
+    padding: 0px;
+    --color: rgba(221, 221, 221, 0.756);
+}
+
+//  Texto da lista dos status da gameplay
+.status-list-label-style{
+    font-family: "Londrina Solid", cursive;
+    color: #8e729e;
+}
+
+//  Item com redirect para dados detalhados do jogo
+.game-info-style{
+    --background: #04136146;
+    font-family: "Londrina Solid", cursive;
+    font-size: 16px;
+    padding: 0px;
+    --color: rgba(221, 221, 221, 0.756);
+}

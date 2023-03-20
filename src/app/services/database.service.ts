@@ -77,6 +77,7 @@ export class DatabaseService {
     //  Métodos para elemento de loading
     public loading: HTMLIonLoadingElement;
 
+    //  Criar o loading
     public async createLoading(messageToShow: string){
         this.loading = await this.loadingController.create({
             message : messageToShow,
@@ -84,13 +85,18 @@ export class DatabaseService {
         });
     }
     
+    //  Fechar o loading
     public async dismissLoading(){
         this.loading.dismiss();
     }
 
+    //  Exibir o loading
     public async presentLoading(){
         await this.loading.present();
     }
+
+    //  Jogos carregados a partir dos registros de jogatinas
+    public gameplayBuiltGames: Map<Number, Game> = new Map();
 
     //  Map para paginação de jogos carregados
     public builtGamesToShowMap: Map<Number, Game[]> = new Map();
@@ -188,7 +194,7 @@ export class DatabaseService {
                     currentGotGames.push(...returnFromAPI);
                     
                     this.builtGamesToShowMap.set(this.currentPage, []);
-                    await this.buildAppGames(currentGotGames);
+                    await this.buildAppGames(currentGotGames, false);
                 }
                 
                 this.clearFormattedInputName();
@@ -271,7 +277,7 @@ export class DatabaseService {
 
     //  Monta objetos dos Jogos, que serão armazenados em listas e exibidos na aplicação
     //  Recebe uma lista dos jogos no formato recebido pela API
-    public async buildAppGames(apiGamesToBuild: APIGame[]){
+	public async buildAppGames(apiGamesToBuild: APIGame[], loadingFromGameplays: boolean){
 		for(let apiGame of apiGamesToBuild){
 
             let apiGenres   : any[] = apiGame['genres'];
@@ -306,7 +312,11 @@ export class DatabaseService {
                              apiCompanies.map(apiCompany => apiCompany['name']) : ["Sem empresa registrada"]
 			};
 
-            this.builtGamesToShowMap.get(this.currentPage).push(game);
+            if(!loadingFromGameplays){
+                this.builtGamesToShowMap.get(this.currentPage).push(game);
+            } else {
+				this.gameplayBuiltGames.set(game.id, game);
+			}
 		}
 	}
 

@@ -48,6 +48,8 @@ export class HomePage {
 			await this.databaseService.getGamesFromAPI(
 				this.databaseService.getBuiltQueryURL()
             );
+			await this.gameplaysService.getGameplaysInfoFromAPI();
+            
 			this.databaseService.haveAppOpened = true;
 
 			this.dismissLoading();
