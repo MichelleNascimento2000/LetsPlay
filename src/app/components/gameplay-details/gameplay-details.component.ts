@@ -20,5 +20,6 @@ export class GameplayDetailsComponent implements OnInit {
     
 	ngOnInit(){
 		this.gameplaysService.gameplayToShow = this.gameplay_to_show;
+		this.gameplaysService.loadGameplayStagesAllStatus();
 	}
 }

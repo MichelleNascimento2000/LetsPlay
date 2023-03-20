@@ -21,3 +21,40 @@
     font-size: 20px;
     color: #3D0461;
 }
+
+//  Botão de adicionar stage para a Gameplay
+.add-stage-button-style{
+    --background: var(--darker-purple);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-left: 42%;
+    margin-right: 42%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+
+    font-family: 'Londrina Solid', cursive; 
+    font-size: 20px;
+}
+
+//  Mensagem para nenhuma correspondência de busca - Card de exibição
+.no-results-card-style{
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 15px;
+    padding: 5px;
+    
+    --background: #e42b2b7f;
+}
+
+//  Mensagem para nenhuma correspondência de busca - Estilo da fonte
+.no-results-input-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 400;
+    font-size: 15px;
+    
+    --color: #3a0000;
+    color: #3a0000;
+}

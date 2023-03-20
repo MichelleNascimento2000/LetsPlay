@@ -44,4 +44,59 @@
 			<ion-textarea autoGrow="true" [(ngModel)]="gameplay_to_show.notes" (ngModelChange)="gameplaysService.updateGameplays()" class="textarea-input-style"></ion-textarea>
 		</ion-card>
 	</ion-grid>
+
+    <!-- Seção de seleção de fases -->
+	<ion-grid *ngIf="gameplaysService.isTabSelected('Fases', gameplaysService.gameplayDetailsSection)">
+
+        <!-- Botão para seguir com a adição de uma nova fase -->
+		<ion-button (click)="gameplaysService.enterNameDescription()" class="add-stage-button-style">
+			<ion-icon name="add-circle"></ion-icon>
+		</ion-button>
+
+        <!-- Exibição para quando não há fases para exibir -->
+		<ion-card *ngIf="gameplaysService.getCurrentStagesSetToShow().length == 0" class="no-results-card-style">
+			<ion-text class="no-results-input-style">Sem resultados!</ion-text>
+		</ion-card>
+
+        <!-- Itera sobre as fases da gameplay -->
+        <ion-card   *ngFor="let stage of gameplaysService.getCurrentStagesSetToShow()" 
+                    class="card-style" 
+                    [ngStyle]="{'--background': this.gameplaysService.allColorsMap.get(stage.id % 2 + 'Background')}">
+			<ion-grid fixed>
+				<ion-row>
+					<ion-col size="10">
+                        
+                        <!-- ID da fase -->
+						<ion-text   class="card-input-style" 
+                                    [ngStyle]="{'color': this.gameplaysService.allColorsMap.get(stage.id % 2 + 'Font')}"
+                                    style="font-size: 15px;">Nº {{stage.id}}<br>
+                        </ion-text>
+
+                        <!-- Nome da fase -->
+						<ion-text   class="card-input-style" 
+                                    [ngStyle]="{'color': this.gameplaysService.allColorsMap.get(stage.id % 2 + 'Font')}"
+                                    style="font-size: 15px;">Nome: {{stage.name}}<br>
+                        </ion-text>
+
+                        <!-- Descrição da fase -->
+						<ion-text   class="card-input-style" 
+                                    [ngStyle]="{'color': this.gameplaysService.allColorsMap.get(stage.id % 2 + 'Font')}"
+                                    style="font-size: 15px;">Descrição: {{stage.description}}<br>
+                        </ion-text>
+
+                        <!-- Status da fase -->
+						<ion-text   class="card-input-style" 
+                                    [ngStyle]="{'color': this.gameplaysService.allColorsMap.get(stage.id % 2 + 'Font')}"
+                                    style="font-size: 15px;">Status: {{stage.status}}<br>
+                        </ion-text>
+
+					</ion-col>
+
+				</ion-row>
+			</ion-grid>
+		</ion-card>
+	</ion-grid>
+
+	<div style="margin-bottom: 130px;"></div>
+        
 </ion-content>

@@ -224,6 +224,20 @@
     color: #3a1900;
 }
 
+//  Stages - Card para exibição
+.card-style{
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 15px;
+    padding: 5px;
+}
+
+//  Stages - Estilo das fontes do card de exibição
+.card-input-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 400;
+}
+
 //  Estilo do elemento de Loading
 .loading-info-style{
     --background: #1E0230;

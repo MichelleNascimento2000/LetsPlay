@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { APIGame, Game, Gameplay, GameplayDetailsSections, GameplayStatusOptions } from '../models/API-Models';
+import { APIGame, Game, Gameplay, GameplayDetailsSections, GameplayStage, GameplayStageStatusOptions, GameplayStatusOptions } from '../models/API-Models';
 import { AlertController, AlertInput } from '@ionic/angular';
 import { DatabaseService } from './database.service';
 import { Storage } from '@ionic/storage';
@@ -57,6 +57,26 @@ export class GameplaysService {
     //  Enum com os valores das possíveis seções da página de detalhes de gameplay, para exibição das tabs
     public gameplayDetailsSectionsEnum = GameplayDetailsSections;
     
+    //  Variável para guardar a fase sendo exibida/manipulada atualmente, para exibição dos seus detalhes
+	public currentStage: GameplayStage;
+    
+    //  Map com todas as fases da gameplay atual, separadas por Status e número da página de exibição
+    public builtStagesToShow: Map<String, GameplayStage[]> = new Map();
+
+    //  Map das fases do usuário a serem exibidas para a gameplay atual
+	public renderedGameplayStages: GameplayStage[] = [];
+    
+
+    //  Cores dos estilos a serem usados nos cards das fases
+    //  Fases "pares" serão verdes, e "ímpares" serão amarelas
+    public allColorsMap = new Map([
+        ['0TitleBackground', '#1b9a39bd'],
+        ['1TitleBackground', '#d2af24bd'],
+        ['0Font',            '#003a0e'  ],
+        ['0Background',      '#1b9a3980'],
+        ['1Font',            '#383a00'  ],
+        ['1Background',      '#e1e42b4c']
+    ]);
 
     //  Carregar informações dos jogos contidos dentre as gameplays salvas pelo usuário
     public async getGameplaysInfoFromAPI(){
@@ -216,6 +236,7 @@ export class GameplaysService {
             lastModifiedDate      : new Date(),
             oldStatus             : chosenStatus,
             status                : chosenStatus,
+			stages                : [],
             stagesCreated         : 0,
             notes                 : ''
         };
@@ -572,6 +593,165 @@ export class GameplaysService {
 		this.resetPages();
 		this.gameplayDetailsSection = gameplayDetailsSection;
 	}
+
+    //  Exibe alert para entrada das infos de nome e descrição da nova fase da gameplay atual
+    public async enterNameDescription() {
+
+        //  Em caso de confirmação, prosseguir com a entrada do status da fase
+		const alert = await this.alertController.create({
+			cssClass: 'base-alert-style',
+			message: 'Entre com as informações da fase',
+			inputs: [
+				{
+					name: 'stageName',
+					value: '',
+					type: 'text',
+					placeholder: 'Nome'
+				},
+				{
+					name: 'stageDescription',
+					value: '',
+					type: 'text',
+					placeholder: 'Descrição'
+				}
+			],
+			buttons: [
+				{
+					text: 'OK',
+					handler: alertInputs => this.enterStageStatus(alertInputs.stageName, alertInputs.stageDescription)
+
+				},
+				'Cancelar'
+			]
+		});
+
+		alert.present();
+	}
+
+    //  Exibe alert para o usuário selecionar o status da nova fase
+    public async enterStageStatus(chosenStageName: string, chosenStageDescription: string) {
+        
+        //  O nome e a descrição enviados não podem estar vazios
+        if(!Boolean(chosenStageName) && !Boolean(chosenStageDescription)){
+            this.databaseService.showSuccessErrorToast(false, 'Você deve inserir valores antes de continuar!');
+			this.enterNameDescription();
+            return;
+        }
+
+        //  Em caso de confirmação, prosseguir com a criação da fase
+        const alert = await this.alertController.create({
+            cssClass: 'base-alert-style',
+            message: 'Entre com o status da fase',
+            inputs: [
+                {
+                    name: 'emProgresso',
+                    type: 'radio',
+                    label: GameplayStageStatusOptions.EmProgresso,
+                    value: GameplayStageStatusOptions.EmProgresso,
+                    checked: true,
+                    cssClass: 'input1'
+                },
+                {
+                    name: 'pausado',
+                    type: 'radio',
+                    label: GameplayStageStatusOptions.Pausado,
+                    value: GameplayStageStatusOptions.Pausado,
+                    cssClass: 'input1'
+                },
+                {
+                    name: 'concluido',
+                    type: 'radio',
+                    label: GameplayStageStatusOptions.Concluido,
+                    value: GameplayStageStatusOptions.Concluido,
+                    cssClass: 'input1'
+                }
+            ],
+            buttons: [
+                {
+                    text: 'OK',
+                    handler: alertInputs => this.addStage(chosenStageName, chosenStageDescription, alertInputs)
+
+                },
+                'Cancelar'
+            ]
+        });
+        alert.present();
+	}
+
+    //  Criar nova fase e atribuí-la à gameplay sendo exibida
+    public async addStage(chosenStageName: string, chosenStageDescription: string, chosenStatus: GameplayStageStatusOptions){
+        let date = new Date();
+
+        let stage: GameplayStage = {
+            gameplay              : this.gameplayToShow,
+            id                    : this.gameplayToShow.stagesCreated + 1,
+            name                  : chosenStageName,
+            description           : chosenStageDescription,
+            status                : chosenStatus,
+            oldStatus             : chosenStatus,
+            createdDate           : date.toLocaleString('pt-BR', this.databaseService.dateTimeFormat),
+            lastModifiedDateString: date.toLocaleString('pt-BR', this.databaseService.dateTimeFormat),
+            lastModifiedDate      : date
+        }
+
+        //  Incrementa variável auxiliar na gameplay que indica quantas fases ela tem, o que é usado para criação do ID da fase
+        this.gameplayToShow.stagesCreated++;
+
+        //  Adiciona fase no topo da lista de todas as fases criadas para a gameplay
+        this.gameplayToShow.stages.unshift(stage)
+
+        //  Carrega e organiza a paginação de todas as fases agora existentes para a gameplay
+        this.populateAllCurrentGameplayStages();
+
+        //  Atualiza todas gameplays no Storage
+        this.saveGameplaysToStorage();
+
+        //  Exibe mensagem de sucesso
+        this.databaseService.showSuccessErrorToast(true, 'Fase criada com sucesso!');
+    }
+
+    //  Carregar fases paginadas de acordo com cada status da fase da gameplay sendo exibida
+	public populateAllCurrentGameplayStages(){
+
+        //  Iterar por todos os status possíveis das fases
+		for(let status of Object.values(GameplayStageStatusOptions)){
+			
+            //  Resetar stages atualmente exibidas
+			this.resetBuiltStagesMap(status)
+			
+            //  Popula o Map usando todas as fases existentes para a gameplay
+            this.builtStagesToShow.set(status, []);
+            for(let item of this.gameplayToShow.stages.filter(play => play.status == status)){
+                this.builtStagesToShow.get(status).push(item);
+            }
+
+		}
+		
+        //  Cria conjunto separado para guardar todas as fases
+		this.builtStagesToShow.set('Todos', []);
+        for(let item of this.gameplayToShow.stages){
+            this.builtStagesToShow.get('Todos').push(item);
+		}
+
+        this.renderedGameplayStages = this.builtStagesToShow.get('Todos');
+	}
+
+    //  Resetar o Map de exibição das stages
+    public resetBuiltStagesMap(status: string){
+        this.builtStagesToShow.set(status, []);
+    }
+    
+    //  Carregar todas as fases da gameplay em questão no Map de fases renderizadas
+    public loadGameplayStagesAllStatus() {
+
+        //  Preencher Map com todas as fases da gameplay atual
+        this.populateAllCurrentGameplayStages();
+    }
+
+    //  Retorna o atual conjunto de fases de acordo com o status e texto filtrados, e a página atual
+    public getCurrentStagesSetToShow(){
+        return this.renderedGameplayStages;
+    }
 
     //  Método chamado para que, a cada vez que a seção de anotações é modificada, a gameplay é atualizada no Storage
     public updateGameplays(){

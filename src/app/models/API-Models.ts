@@ -92,16 +92,37 @@ export interface FilterOptionsParams {
 
 //  Aplicação - Gameplay
 export interface Gameplay{
-    gameId                : number; //  ID do jogo na API
-    gameName              : string; //  Nome
-    gameCoverURL          : string; //  Imagem
-    name                  : string; //  Título da gameplay
-    addingDate            : string; //  Data de criação
-    lastModifiedDate      : Date;   //  Valor com data da última modificação
-    oldStatus             : string; //  Status antigo (auxiliar para operação de alteração)
-    status                : string; //  Status atual
-    stagesCreated         : number; //  Quantidade de fases criadas
-    notes                 : string; //  Anotações
+    gameId                : number;             //  ID do jogo na API
+    gameName              : string;             //  Nome
+    gameCoverURL          : string;             //  Imagem
+    name                  : string;             //  Título da gameplay
+    addingDate            : string;             //  Data de criação
+    lastModifiedDate      : Date;               //  Valor com data da última modificação
+    oldStatus             : string;             //  Status antigo (auxiliar para operação de alteração)
+    status                : string;             //  Status atual
+    stages                : GameplayStage[];    //  Fases
+    stagesCreated         : number;             //  Quantidade de fases criadas
+    notes                 : string;             //  Anotações
+}
+
+//  Aplicação - Fase da gameplay
+export interface GameplayStage{
+    gameplay              : Gameplay;                   //  Gameplay da fase
+    id                    : number;                     //  ID da fase
+    name                  : string;                     //  Nome
+    description           : string;                     //  Descrição
+    status                : GameplayStageStatusOptions; //  Status atual
+    oldStatus             : GameplayStageStatusOptions; //  Status antigo (auxiliar para operação de alteração)
+    createdDate           : string;                     //  Data de criação
+    lastModifiedDateString: string;                     //  String com data da última modificação
+    lastModifiedDate      : Date;                       //  Valor com data da última modificação
+}
+
+
+export enum GameplayStageStatusOptions {
+    EmProgresso = 'Em progresso',
+    Pausado     = 'Pausado',
+    Concluido   = 'Concluído'
 }
 
 //  Aplicação - Enum de cada filtro
