@@ -573,6 +573,16 @@ export class GameplaysService {
 		this.gameplayDetailsSection = gameplayDetailsSection;
 	}
 
+    //  Método chamado para que, a cada vez que a seção de anotações é modificada, a gameplay é atualizada no Storage
+    public updateGameplays(){
+
+        //  Atualizar data da última modificação
+		this.updateGameplayLastModifiedDate(this.gameplayToShow);
+
+        //  Salvar tudo no Storage
+		this.saveGameplaysToStorage();
+	}
+
     //  Retorna o conjunto atual de itens, dado o tipo de item, o status e o número da página atual
     public getSetOfItemsByTypeStatusPage(itemType: string, status: string, page: number): any[]{
         if(itemType == 'Gameplays'){

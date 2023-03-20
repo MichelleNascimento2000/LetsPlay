@@ -37,4 +37,11 @@
 
 		</ion-row>
 	</ion-grid>
+
+    <!-- Seção de anotações livres -->
+	<ion-grid *ngIf="gameplaysService.isTabSelected('Notas', gameplaysService.gameplayDetailsSection)">
+		<ion-card class="textarea-card-style">
+			<ion-textarea autoGrow="true" [(ngModel)]="gameplay_to_show.notes" (ngModelChange)="gameplaysService.updateGameplays()" class="textarea-input-style"></ion-textarea>
+		</ion-card>
+	</ion-grid>
 </ion-content>
