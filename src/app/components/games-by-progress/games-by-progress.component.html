@@ -11,6 +11,12 @@
 
 <ion-content class="background">
 
+    <!-- Busca de gameplays por nome -->
+	<ion-item color="none">
+		<ion-input [(ngModel)]="gameplaysService.gameplayTextInput" (ngModelChange)="gameplaysService.searchGameplayByTextInput()" placeholder="Buscar por nome" type="text" class="search-by-name-style">
+		</ion-input>
+	</ion-item>
+
     <!-- Mensagem para quando não há gameplays com o status ou texto atual -->
     <ion-card   *ngIf="!gameplaysService.getCurrentGameplaySetToShow().length"
                 class="no-loaded-gameplays-card-style"

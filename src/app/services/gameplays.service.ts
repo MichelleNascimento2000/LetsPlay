@@ -39,6 +39,9 @@ export class GameplaysService {
     
     //  Página atualmente sendo exibida
 	public currentPage: number = 1;
+    
+    //  Variável para guardar o input de texto do usuário a ser aplicado na busca de gameplays
+    public gameplayTextInput: string;
 
     //  Variáveis de controle para parametrizar a função do botão de retornar da página de detalhes de um jogo
     public comingFromSearch: Boolean = false;
@@ -324,6 +327,82 @@ export class GameplaysService {
         }
     }
 
+    //  Buscar gameplays por associação do texto com o nome do jogo ou da gameplay
+    public searchGameplayByTextInput(){
+
+        //  Se não houver input, apenas carregar todas as gameplays
+		if(!Boolean(this.gameplayTextInput)){
+            this.populateAllGameplaysToShowMap();
+            return;
+        }
+
+        this.resetPages();
+
+        //  Buscar correspondência, dentre todas as gameplays do status atualmente filtrado, com nome da gameplay ou do jogo
+        let input = this.formatInput(this.gameplayTextInput);
+        this.populateRenderedMapWithFilteredGameplays(
+            Array.from(this.builtGameplaysToShowMap.get(this.progressName).values()).flatMap(value => value)
+            .filter(play => this.formatInput(play.name)    .includes(input) || 
+                            this.formatInput(play.gameName).includes(input)
+            )
+        );
+        
+	}
+    
+    //  Exibir apenas as gameplays filtradas a partir do input textual 
+    public populateRenderedMapWithFilteredGameplays(filteredGameplays: Gameplay[]){
+
+        //  Executar operação para todos os status de gameplay
+		for(let status of Object.values(GameplayStatusOptions)){
+
+            //  Resetar gameplays atualmente exibidas
+			this.resetRenderedBuiltGameplaysMap(status);
+
+            //  Usar lista de gameplays passadas como parâmetro
+			this.putItemsToMap(this.renderedBuiltGameplaysToShowMap.get(status), filteredGameplays.filter(play => play.status == status));
+		}
+	}
+
+    //  Resetar o Map de exibição das gameplays filtradas a serem lançadas pontualmente na página
+    public resetRenderedBuiltGameplaysMap(status: string){
+        this.renderedBuiltGameplaysToShowMap.set(status, new Map([
+            [1, []]
+        ]));
+    }
+
+    //  Formatar string recebida, retirando caracteres especiais e deixando tudo em maiúsculas
+    public formatInput(input: string): string{
+        return this.replaceSpecialCharactersLetters(input).toUpperCase();
+    }
+
+    //  Retirar caracteres especiais de string recebida
+    public replaceSpecialCharactersLetters(text: string): string{
+		return text
+			.replace('á', 'a')
+			.replace('à', 'a')
+			.replace('ã', 'a')
+			.replace('â', 'a')
+			.replace('ä', 'a')
+			.replace('é', 'e')
+			.replace('è', 'e')
+			.replace('ê', 'e')
+			.replace('ë', 'e')
+			.replace('í', 'i')
+			.replace('ì', 'i')
+			.replace('î', 'i')
+			.replace('ï', 'i')
+			.replace('ó', 'o')
+			.replace('ò', 'o')
+			.replace('ô', 'o')
+			.replace('õ', 'o')
+			.replace('ö', 'o')
+			.replace('ú', 'u')
+			.replace('ù', 'u')
+			.replace('û', 'u')
+			.replace('ü', 'u')
+			.replace('ñ', 'n');
+	}
+    
     //  Exibe mensagem de confirmação para mudança de status da gameplay
     public async confirmGameStatusChange(game: Gameplay) {
 
