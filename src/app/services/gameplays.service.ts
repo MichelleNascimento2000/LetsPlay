@@ -767,15 +767,37 @@ export class GameplaysService {
             //  Se for todos, carregar todas as fases independente de status
 			this.loadGameplayStagesAllStatus();
 		}
+
+        //  Aplicar filtro de texto, pois ambos o de texto e o de status precisam ser aplicados juntos sempre que existentes
+		this.searchStageByTextInput();
+	}
+
+    //  Aplicar filtragem das fases por input de texto, linkando com os campos de nome, descrição e ID da fase
+    public searchStageByTextInput(){
+
         //  Resetar páginas pois a filtragem precisa ser exibida da primeira página pra frente
-        this.resetPages();
-    
+		this.resetPages();
+
         //  Resetar fases sendo exibidas no momento
         this.resetRenderedStagesMap();
+
+        //  Se não há nada no input de texto, apenas exibir as fases que jã estão filtradas por status
+		if(!Boolean(this.stageTextInput)){
+            this.putItemsToMap(this.renderedGameplayStagesMap, this.currentFilteredStagesByStatus);
+            return;
+        }
+
+        //  Filtrar por nome, descrição ou ID
+        let input = this.formatInput(this.stageTextInput);
+        let textFilteredStages = this.currentFilteredStagesByStatus.filter(
+            stage =>    (String)(stage.id) == this.stageTextInput || 
+                        this.formatInput(stage.name).includes(input) || 
+                        this.formatInput(stage.description).includes(input)
+        );
         
         //  Adicionar no Map de fases renderizadas os itens recém obtidos da filtragem
-        this.putItemsToMap(this.renderedGameplayStagesMap, this.currentFilteredStagesByStatus);
-	}
+        this.putItemsToMap(this.renderedGameplayStagesMap, textFilteredStages);
+    }
     
     //  Carregar todas as fases da gameplay em questão no Map de fases renderizadas
     public loadGameplayStagesAllStatus() {
@@ -800,6 +822,48 @@ export class GameplaysService {
     public getCurrentStagesSetToShow(){
         return this.renderedGameplayStagesMap.get(this.currentPage);
     }
+
+    //  Exibe alert de confirmação para deleção da fase
+	public async confirmStageDeletion(stage: GameplayStage){
+		
+        //  Em caso de confirmação, prosseguir com a deleção
+        const alert = await this.alertController.create({
+			cssClass: 'base-alert-style',
+			message: 'Você deseja mesmo deletar essa fase? Essa ação não pode ser desfeita',
+			buttons: [
+				{
+					text: 'Sim',
+					handler: () => this.deleteStage(stage)
+				},
+				{
+					text: 'Não'
+				}
+				
+			]
+		});
+		await alert.present();
+	}
+
+    //  Deletar fase da gameplay
+	public async deleteStage(stage: GameplayStage){
+
+        //  Atualizar data de última modificação da gameplay
+		this.updateGameplayLastModifiedDate(this.gameplayToShow);
+
+        //  Retirar fase da lista das fases da gameplay 
+		this.gameplayToShow.stages.splice(
+			this.gameplayToShow.stages.findIndex(s => s == stage), 1
+		);
+
+        //  Salvar atualizações no Storagte
+		this.saveGameplaysToStorage();
+
+        //  Reaplicar filtragem de status e texto às fases
+		this.applyStageStatusAndTextFilter();
+
+        //  Exibir mensagem de sucesso
+		this.databaseService.showSuccessErrorToast(true, 'Stage deletada com sucesso!');
+	}
 
     //  Método chamado para que, a cada vez que a seção de anotações é modificada, a gameplay é atualizada no Storage
     public updateGameplays(){

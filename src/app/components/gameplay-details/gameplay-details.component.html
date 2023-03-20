@@ -52,6 +52,12 @@
 		<ion-button (click)="gameplaysService.enterNameDescription()" class="add-stage-button-style">
 			<ion-icon name="add-circle"></ion-icon>
 		</ion-button>
+		
+        <!-- Busca de fase por seu nome ou descrição -->
+		<ion-item color="none">
+			<ion-input [(ngModel)]="gameplaysService.stageTextInput" (ngModelChange)="gameplaysService.searchStageByTextInput()" placeholder="Buscar por nome" type="text" class="search-by-name-style">
+			</ion-input>
+		</ion-item>
 
         <!-- Filtros de status das fases -->
 		<ion-segment [(ngModel)]="gameplaysService.chosenStageStatus" (ngModelChange)="gameplaysService.applyStageStatusAndTextFilter()" >
@@ -105,6 +111,13 @@
                                     style="font-size: 15px;">Status: {{stage.status}}<br>
                         </ion-text>
 
+					</ion-col>
+
+                    <!-- Botão de deleção da fase -->
+					<ion-col size="2">
+						<ion-button size="small" (click)="gameplaysService.confirmStageDeletion(stage)" class="delete-stage-button-style">
+							<ion-icon size="small" slot="icon-only" name="trash" size="medium"></ion-icon>
+						</ion-button>
 					</ion-col>
 
 				</ion-row>
