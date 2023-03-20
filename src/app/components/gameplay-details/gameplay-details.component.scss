@@ -79,3 +79,22 @@ ion-segment-button{
     --background: rgba(87, 32, 32, 0.75);
     --color: #cde3ef92;
 }
+
+//  Históricos - Card de exibição
+.history-card-style{
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 15px;
+    padding: 5px;
+    
+    --background: #161616b0;
+}
+
+//  Históricos - Estilo da fonte
+.history-text-style{
+    font-family: "Londrina Solid", cursive;
+    font-weight: 400;
+    font-size: 15px;
+    
+    color: #c8c8c896;
+}

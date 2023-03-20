@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { APIGame, Game, Gameplay, GameplayDetailsSections, GameplayStage, GameplayStageStatusOptions, GameplayStatusOptions } from '../models/API-Models';
+import { APIGame, Game, Gameplay, GameplayDetailsSections, GameplayHistory, GameplayStage, GameplayStageStatusOptions, GameplayStatusOptions, HistoryType } from '../models/API-Models';
 import { AlertController, AlertInput } from '@ionic/angular';
 import { DatabaseService } from './database.service';
 import { Storage } from '@ionic/storage';
@@ -42,7 +42,10 @@ export class GameplaysService {
     
     //  Variável para guardar o input de texto do usuário a ser aplicado na busca de gameplays
     public gameplayTextInput: string;
-
+    
+    //  Map com os itens de histórico da gameplay a ser exibida
+    public builtHistoriesToShowMap: Map<Number, GameplayHistory[]> = new Map();
+    
     //  Variáveis de controle para parametrizar a função do botão de retornar da página de detalhes de um jogo
     public comingFromSearch: Boolean = false;
     
@@ -250,11 +253,15 @@ export class GameplaysService {
             status                : chosenStatus,
 			stages                : [],
             stagesCreated         : 0,
-            notes                 : ''
+            notes                 : '',
+			historyItems          : []
 		};
 
         //  Adiciona jogo em questão no Map de jogos carregados via gameplays
         this.databaseService.gameplayBuiltGames.set(game.id, game);
+
+        //  Cria o primeiro item de histórico para a gameplay
+		this.createHistoryItem(gameplay, HistoryType.CriacaoPlay, null, gameplay.name, chosenStatus);
 
         //  Adiciona gameplay na lista de gameplays, e no topo de todas
         this.allGameplays.unshift(gameplay);
@@ -473,6 +480,46 @@ export class GameplaysService {
 			.replace('ñ', 'n');
 	}
 
+    //  Cria um item de histórico de modificações para a gameplay em questão
+	public createHistoryItem(gameplay: Gameplay, historyType: HistoryType, oldValue: string, newValue: string, additional: any){
+        let now = new Date().toLocaleDateString('pt-BR', this.databaseService.dateTimeFormat);
+
+        //  Map parametrizando cada texto de cada histórico 
+        const historyTypeToTextMap: Map<HistoryType, string> = new Map([
+            [HistoryType.CriacaoPlay,    `Gameplay com nome "${newValue}" e status "${additional}" criada em ${now}.`              ],
+            [HistoryType.StatusPlay,     `Status da gameplay modificado de "${oldValue}" para "${newValue}" em ${now}.`            ],
+            [HistoryType.AdicionarStage, `Fase com nome "${newValue}" e status "${additional}" criada em ${now}.`                  ],
+            [HistoryType.DeletarStage,   `Fase com nome "${oldValue}" deletada em ${now}.`                                         ],
+            [HistoryType.TituloStage,    `Fase com título modificado de "${oldValue}" para "${newValue}" em ${now}.`               ],
+            [HistoryType.StatusStage,    `Status da fase "${additional}" modificado de "${oldValue}" para "${newValue}" em ${now}.`]
+        ]);
+
+        //  Adiciona no início da lista de históricos
+        gameplay.historyItems.unshift({
+            gameplay: gameplay,
+            type    : historyType,
+            text    : historyTypeToTextMap.get(historyType)
+        });
+
+        //  Carrega os históricos da gameplay em questão
+		this.populateAllHistoriesToShowMap(gameplay);
+	}
+
+    //  Carregar histórico paginado de acordo com a gameplay passada como parâmetro
+	public populateAllHistoriesToShowMap(gameplay: Gameplay){
+
+        //  Resetar itens de histórico atualmente exibidos
+		this.resetBuiltHistoriesMap();
+
+        //  Usar histórico da gameplay passada de parâmetro para popular o Map
+		this.putItemsToMap(this.builtHistoriesToShowMap, gameplay.historyItems);
+	}
+
+    //  Resetar o Map de exibição das stages
+    public resetBuiltHistoriesMap(){
+		this.builtHistoriesToShowMap.set(1, []);
+    }
+
     //  Exibe mensagem de confirmação para mudança de status da gameplay
     public async confirmGameStatusChange(game: Gameplay) {
 
@@ -513,6 +560,9 @@ export class GameplaysService {
         game.status    = newStatus;
         game.oldStatus = game.status;
         
+        //  Criar histórico para registrar mudança de status
+        this.createHistoryItem(game, HistoryType.StatusPlay, this.progressName, newStatus, null);
+
         //  Atualizar data da última modificação da gameplay
         this.updateGameplayLastModifiedDate(game);
 
@@ -734,6 +784,9 @@ export class GameplaysService {
         //  Incrementa variável auxiliar na gameplay que indica quantas fases ela tem, o que é usado para criação do ID da fase
         this.gameplayToShow.stagesCreated++;
 
+        //  Criar item de histórico para registrar criação da fase
+        this.createHistoryItem(this.gameplayToShow, HistoryType.AdicionarStage, null, stage.name, chosenStatus);
+
         //  Adiciona fase no topo da lista de todas as fases criadas para a gameplay
         this.gameplayToShow.stages.unshift(stage)
 
@@ -742,7 +795,7 @@ export class GameplaysService {
 
         //  Carrega e organiza a paginação de todas as fases agora existentes para a gameplay
         this.populateAllCurrentGameplayStagesMap();
-        
+
         //  Atualiza todas gameplays no Storage
         this.saveGameplaysToStorage();
 
@@ -890,10 +943,14 @@ export class GameplaysService {
 
     //  Efetuar mudança de status da fase
 	public makeStageStatusChange(stage: GameplayStage, newStatus: GameplayStageStatusOptions){
+
+        //  Criar item de histórico para registrar a mudança
+		this.createHistoryItem(stage.gameplay, HistoryType.StatusStage, stage.status, newStatus, stage.name);
+
 		stage.status    = newStatus;
 		stage.oldStatus = stage.status;
 
-        //  Atualizar data da última modificação da gameplay
+        //  Atualizar data da última modificação da fase
 		this.updateStageLastModifiedDate(stage);
 
 		this.saveGameplaysToStorage();
@@ -984,6 +1041,9 @@ export class GameplaysService {
         //  Atualizar data de última modificação da gameplay
 		this.updateGameplayLastModifiedDate(this.gameplayToShow);
 
+        //  Criar item de histórico para registrar deleção
+		this.createHistoryItem(stage.gameplay, HistoryType.DeletarStage, stage.name, null, null);
+		
         //  Retirar fase da lista das fases da gameplay 
 		this.gameplayToShow.stages.splice(
 			this.gameplayToShow.stages.findIndex(s => s == stage), 1
@@ -1017,6 +1077,10 @@ export class GameplaysService {
 
         if(itemType == 'Stages'){
             return this.builtStagesToShowMap.get(status).get(page);
+        }
+
+        if(itemType == 'History'){
+            return this.builtHistoriesToShowMap.get(page);
         }
     }
 	

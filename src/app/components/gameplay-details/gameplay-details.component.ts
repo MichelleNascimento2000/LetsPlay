@@ -19,7 +19,10 @@ export class GameplayDetailsComponent implements OnInit {
 
     
 	ngOnInit(){
+
+        //  Carrega as fases e histórico da gameplay a ser exibida
 		this.gameplaysService.gameplayToShow = this.gameplay_to_show;
 		this.gameplaysService.loadGameplayStagesAllStatus();
+        this.gameplaysService.populateAllHistoriesToShowMap(this.gameplay_to_show);
 	}
 }

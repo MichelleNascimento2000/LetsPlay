@@ -103,6 +103,7 @@ export interface Gameplay{
     stages                : GameplayStage[];    //  Fases
     stagesCreated         : number;             //  Quantidade de fases criadas
     notes                 : string;             //  Anotações
+    historyItems          : GameplayHistory[];  //  Itens do histórico
 }
 
 //  Aplicação - Fase da gameplay
@@ -116,6 +117,13 @@ export interface GameplayStage{
     createdDate           : string;                     //  Data de criação
     lastModifiedDateString: string;                     //  String com data da última modificação
     lastModifiedDate      : Date;                       //  Valor com data da última modificação
+}
+
+//  Aplicação - Histórico da gameplay
+export interface GameplayHistory{
+    gameplay: Gameplay;
+    type    : HistoryType;
+    text    : string;
 }
 
 
@@ -147,4 +155,14 @@ export enum GameplayDetailsSections {
     Notas     = 'Notas',
     Fases     = 'Fases',
     Historico = 'Histórico'
+}
+
+//  Aplicação - Enum com o tipo do item do histórico
+export enum HistoryType {
+    CriacaoPlay,
+    StatusPlay,
+    AdicionarStage,
+    DeletarStage,
+    TituloStage,
+    StatusStage
 }

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { GameplayStage } from 'src/app/models/API-Models';
+import { GameplayStage, HistoryType } from 'src/app/models/API-Models';
 import { DatabaseService } from 'src/app/services/database.service';
 import { GameplaysService } from 'src/app/services/gameplays.service';
 
@@ -32,6 +32,12 @@ export class StageDetailsComponent implements OnInit {
     public saveStage(): boolean {
         if(!this.isNameDescriptionDataValid()){
             return false;
+        }
+
+        //  Se o nome da fase mudou, criar item de histórico para registrar
+        //  Não é criad para a descrição pois é um campo de tamanho maior e prejudica a visualização no histórico
+        if(this.didTitleChanged()){
+            this.gameplaysService.createHistoryItem(this.stage_to_show.gameplay, HistoryType.TituloStage, this.stage_to_show.name, this.insertedName, null);
         }
 
         //  Caso os inputs sejam válidos, atribui à fase os valores inseridos para nome e descrição
