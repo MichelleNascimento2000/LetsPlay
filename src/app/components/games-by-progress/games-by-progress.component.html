@@ -102,5 +102,37 @@
 		</ion-grid>
 	</ion-item>
 	
+	<ion-grid fixed slot="fixed" class="footer-page-numbering-style">
+		<ion-row>
+
+            <!-- Espaçamento -->
+			<ion-col size="2"></ion-col>
+
+            <!-- Voltar página -->
+			<ion-col size="2">
+				<ion-button (click)="gameplaysService.backPage()" class="back-forward-page-style" style="bottom: 50px">
+					<ion-icon slot="icon-only" name="arrow-back-circle"></ion-icon>
+				</ion-button>
+			</ion-col>
+
+            <!-- Página atual -->
+			<ion-col size="4">
+				<ion-card color="none" class="page-number-card-style">
+					<ion-label class="page-number-text-style">Página {{gameplaysService.currentPage}}</ion-label>
+				</ion-card>
+			</ion-col>
+
+            <!-- Próxima página -->
+			<ion-col size="2">
+				<ion-button (click)="gameplaysService.forwardPage('Gameplays')" class="back-forward-page-style">
+					<ion-icon slot="icon-only" name="arrow-forward-circle"></ion-icon>
+				</ion-button>
+			</ion-col>
+
+            <!-- Espaçamento -->
+			<ion-col size="2"></ion-col>
+
+		</ion-row>
+	</ion-grid>
 	<div style="margin-bottom: 130px;"></div>
 </ion-content>

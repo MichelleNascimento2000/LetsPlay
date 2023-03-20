@@ -22,16 +22,23 @@ export class GameplaysService {
     public allGameplays: Gameplay[] = [];
 
     //  Map com todas as gameplays do usuário organizadas, separadas por Status e número da página de exibição
-    public builtGameplaysToShowMap: Map<String, Gameplay[]> = new Map();
+    public builtGameplaysToShowMap: Map<String, Map<Number, Gameplay[]>> = new Map();
     
     //  Map com as gameplays do usuário a serem exibidas, separadas por Status e número da página de exibição
-    public renderedBuiltGameplaysToShowMap: Map<String, Gameplay[]> = new Map();
+    public renderedBuiltGameplaysToShowMap: Map<String, Map<Number, Gameplay[]>> = new Map();
     
     //  Enum com os valores dos possíveis status de gameplay para exibição das tabs
     public gameplayStatusOptionsEnum = GameplayStatusOptions;
+
+    //  Variáveis auxiliares para manipulação e construção dos Maps de exibição de Gameplays e Stages
+    public pageIndexForMakingMap    = 1;
+    public itemPositionForMakingMap = 0;
     
     //  Status atualmente sendo filtrado
 	public progressName: string = 'Jogando';
+    
+    //  Página atualmente sendo exibida
+	public currentPage: number = 1;
 
     //  Variáveis de controle para parametrizar a função do botão de retornar da página de detalhes de um jogo
     public comingFromSearch: Boolean = false;
@@ -207,6 +214,9 @@ export class GameplaysService {
         //  Salvar a lista de gameplays atualizadas no Storage
         this.saveGameplaysToStorage();
 
+        //  Atualiza Map das gameplays
+        this.reassignProgressAndRepopulateGameplays(chosenStatus);
+
         //  Exibir Toast de sucesso
         this.databaseService.showSuccessErrorToast(true, 'Gameplay criada com sucesso!');
     }
@@ -217,14 +227,69 @@ export class GameplaysService {
 		this.storage.set('gameplays', this.allGameplays);
 	}
 
+    //  Resetar a variável auxiliar que guarda o índice da página para manipular os Maps
+    public resetPageIndexForMakingMap(){
+        this.pageIndexForMakingMap = 1;
+    }
+
+    //  Resetar a variável auxiliar que guarda a posição do item para manipular os Maps
+    public resetItemPositionForMakingMap(){
+        this.itemPositionForMakingMap = 0;
+    }
+    
     //  Resetar o Map de organização das gameplays
     public resetBuiltGameplaysMap(status: string){
-        this.builtGameplaysToShowMap.set(status, []);
+        this.builtGameplaysToShowMap.set(status, new Map([
+			[1, []]
+		]));
     }
+
+    //  Popular o Map de itens com os itens de uma lista, respeitando a parametrização da paginação
+    //  Adicionar itens em conjuntos de 10
+    public putItemsToMap(mapToAdd: Map<any, any>, listToFilter: any[]){
+		
+        //  O método começará pela primeira página
+		this.resetPageIndexForMakingMap();
+
+        //  O método começará pelo primeiro item
+		this.resetItemPositionForMakingMap();
+
+        //  Variável auxiliar para guardar os itens a serem adicionados
+        let currentPageItems = [];
+
+        //  Caso o status tenha sido passado, a lista deve ser filtrada por ele
+        //  Caso não tenha passado, a lista inteira deve ser repassada para o Map
+		for(let item of listToFilter){
+            //  Incrementar posição do item
+            this.itemPositionForMakingMap++;
+
+            //  Caso tenha chegado no 11, popular a primeira "página" de itens
+			if(this.itemPositionForMakingMap > 10){
+
+                //  Popula página atualmente iterada com a lista montada de itens
+				mapToAdd.set(this.pageIndexForMakingMap, currentPageItems);
+
+                //  Reseta lista montada de itens
+                currentPageItems = [];
+
+                //  Incrementa índice da página
+				this.pageIndexForMakingMap++;
+
+                //  Reseta a posição do item
+				this.resetItemPositionForMakingMap();
+			}
+
+            //  Adiciona item atual na lista
+            currentPageItems.push(item);
+		}
+
+        //  Adiciona os restantes na página atual
+        mapToAdd.set(this.pageIndexForMakingMap, currentPageItems);
+	}
 
     //  Retorna o atual conjunto de gameplays de acordo com o status filtrado e a página atual
     public getCurrentGameplaySetToShow(){
-        return this.renderedBuiltGameplaysToShowMap.get(this.progressName);
+        return this.renderedBuiltGameplaysToShowMap.get(this.progressName).get(this.currentPage);
     }
 
     //  Retorna se a tab passada por parâmetro é a que está selecionada atualmente
@@ -251,10 +316,8 @@ export class GameplaysService {
             //  Resetar Map das gameplays paginadas
             this.resetBuiltGameplaysMap(status);
 
-            //  Adicionar gameplays ao Map de exibição
-    		for(let gameplay of this.allGameplays.filter(gameplay => gameplay.status == status)){
-                this.builtGameplaysToShowMap.get(status).push(gameplay);
-            }
+            //  Popular Map com gameplays do status atual
+            this.putItemsToMap(this.builtGameplaysToShowMap.get(status), this.allGameplays.filter(play => play.status == status));
             
             //  Popular Map de gameplays a ser renderizada com o Map geral recém montado
             this.renderedBuiltGameplaysToShowMap = new Map(this.builtGameplaysToShowMap);
@@ -408,5 +471,37 @@ export class GameplaysService {
     //  Campo de controle para apontar qual é a página pela qual a página de gameplays foi acessada
 	public setComingFromSearch(comingFromSearch){
 		this.comingFromSearch = comingFromSearch;
+	}
+
+    //  Retorna o conjunto atual de itens, dado o tipo de item, o status e o número da página atual
+    public getSetOfItemsByTypeStatusPage(itemType: string, status: string, page: number): any[]{
+        if(itemType == 'Gameplays'){
+            return this.renderedBuiltGameplaysToShowMap.get(status).get(page);
+        }
+    }
+	
+    //  Ir para próxima página
+	public forwardPage(pageType: string){
+        const status = 
+            pageType == 'Gameplays' ? this.progressName : null;
+
+        const pageItems     = this.getSetOfItemsByTypeStatusPage(pageType, status, this.currentPage);
+        const nextPageItems = this.getSetOfItemsByTypeStatusPage(pageType, status, this.currentPage + 1);
+		
+        if(pageItems?.length == 10 && nextPageItems?.length > 0){
+            this.currentPage++;
+		}
+	}
+    
+    //  Ir para página anterior
+    public backPage(){
+        if(this.currentPage > 1){
+            this.currentPage--;
+        }
+    }
+
+    //  Voltar página para a primeira  
+	public resetPages(){
+		this.currentPage = 1;
 	}
 }
