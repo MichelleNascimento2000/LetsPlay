@@ -361,6 +361,44 @@ export class GameplaysService {
 		this.populateAllGameplaysToShowMap();
 	}
 
+    //  Exibe mensagem de confirmação para deleção de gameplay
+    public async confirmGameDeletion(game: Gameplay){
+
+        //  Em caso de confirmação, seguir com a deleção
+        const alert = await this.alertController.create({
+            cssClass: 'base-alert-style',
+            message: 'Você deseja mesmo deletar essa gameplay? Essa ação não pode ser desfeita',
+            buttons: [
+                {
+                    text: 'Sim',
+                    handler: () => this.deleteGameplay(game)
+                },
+                {
+                    text: 'Não'
+                }
+                
+            ]
+        });
+        await alert.present();
+    }
+
+    //  Deletar gameplay especificada da lista
+    public async deleteGameplay(gameplay: Gameplay){
+        let currentStatus: string = gameplay.status;
+        this.allGameplays.splice(
+            this.allGameplays.findIndex(play => play == gameplay), 1
+        );
+        
+        //  Atualiza todas gameplays no Storage
+        this.saveGameplaysToStorage();
+
+        //  Atualiza Map das gameplays
+        this.reassignProgressAndRepopulateGameplays(currentStatus);
+
+        //  Exibe mensagem de sucesso
+        this.databaseService.showSuccessErrorToast(true, 'Gameplay deletada com sucesso!');
+    }
+
     //  Personalizar o retorno a partir da página de gameplays
     //  Ela pode ser acessada a partir da Home ou a partir da página de Busca
     public returnFromGameplaysPage(){

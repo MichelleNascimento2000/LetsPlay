@@ -31,6 +31,13 @@
 					</ion-card>
 				</ion-col>
 
+                <!-- Botão de deleção -->
+				<ion-col>
+					<ion-button (click)="gameplaysService.confirmGameDeletion(gameplay)" class="delete-game-button-style">
+						<ion-icon slot="icon-only" name="trash"></ion-icon>
+					</ion-button>
+				</ion-col>
+
 			</ion-row>
 
 			<ion-row>
