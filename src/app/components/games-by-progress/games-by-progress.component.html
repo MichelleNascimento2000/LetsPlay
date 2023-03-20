@@ -3,8 +3,19 @@
 		<ion-buttons slot="start">
 			<ion-back-button defaultHref="home" (click)="gameplaysService.returnFromGameplaysPage()"></ion-back-button>
 		</ion-buttons>
-		<ion-title class="title">
+		<ion-title class="title" style="padding-top: 15px">
 			Meus jogos
+
+            <!-- Botão para importação das plays -->
+			<ion-button (click)="gameplaysService.importPlays()" fill="clear" shape="round" class="import-button-style">
+				<ion-icon slot="icon-only" name="download" style="color: green;"></ion-icon>
+			</ion-button>
+
+            <!-- Botão para exportação das plays -->
+			<ion-button (click)="gameplaysService.exportPlays()"  fill="clear" shape="round">
+				<ion-icon slot="icon-only" name="share" style="color: orange;"></ion-icon>
+			</ion-button>
+            
 		</ion-title>
 	</ion-toolbar>
 </ion-header>

@@ -1069,6 +1069,141 @@ export class GameplaysService {
 		this.saveGameplaysToStorage();
 	}
 
+    //  Ação a ser realizada ao fazer importação de gameplays
+    public importPlays(){
+
+        //  Apenas chama o alert solicitando que o usuário entre com o texto de backup
+        this.showImportExportAlert('', true);
+    }
+    
+    //  Ação a ser realizada ao fazer exportação de gameplays
+    public exportPlays(){
+        let gameplayObjects = [];
+
+        //  Realiza um Stringify de todas as gameplays e os seus dados
+        for(const gameplay of this.allGameplays){
+            gameplayObjects.push(JSON.stringify({
+                gameId                : gameplay.gameId,
+                gameName              : gameplay.gameName,
+                gameCoverURL          : gameplay.gameCoverURL,
+                name                  : gameplay.name,
+                addingDate            : gameplay.addingDate,
+                lastModifiedDate      : gameplay.lastModifiedDate,
+                oldStatus             : gameplay.oldStatus,
+                status                : gameplay.status,
+                stagesCreated         : gameplay.stagesCreated,
+                notes                 : gameplay.notes,
+                stages                : gameplay.stages?.map(stage => ({
+                                            id                    : stage.id,
+                                            name                  : stage.name,
+                                            description           : stage.description,
+                                            createdDate           : stage.createdDate,
+                                            lastModifiedDateString: stage.lastModifiedDateString,
+                                            status                : stage.status,
+                                            oldStatus             : stage.oldStatus
+                                        })),
+                historyItems           : gameplay.historyItems?.map(hist => ({
+                                            type: hist.type,
+                                            text: hist.text
+                                        }))
+            }));
+        }
+        
+        //  Chama o método para exibir o alert junto com a string JSON com os dados das gameplays para o usuário copiar
+        this.showImportExportAlert(`[${gameplayObjects.join(',')}]`, false);
+    }
+
+    //  Ao clicar no botão de importação ou exportação de gameplays, exibir alert de manipulação dos dados
+    public async showImportExportAlert(content: string, isImport: boolean) {
+
+        //  Exibe mensagens diferentes para importação e para exportação
+		let message =   isImport ? 
+                        'Cole abaixo o texto com o backup das suas jogatinas.' :
+                        'Copie e cole o texto abaixo em um local seguro, este é o seu backup.';
+
+        //  Valor a ser exibido no campo de input/output também depende do tipo de operação 
+		let value = isImport ? '' : content;
+    
+        //  Caso seja exportação, apenas fechar o alert ao clicar OK
+        //  Caso seja importação, chamar processo responsável por traduzir o JSON de backup e converter em gameplays
+		const alert = await this.alertController.create({
+			cssClass: 'base-alert-style',
+			message: message,
+			inputs: [
+				{
+					name: 'backup',
+					value: value,
+					type: 'text'
+				}
+			],
+			buttons: [
+				{
+					text: 'OK',
+					handler:    importValue => (isImport && importValue.backup != '') ? 
+                                this.makeImportProcess(importValue.backup) : alert.dismiss()
+				},
+			]
+		});
+		alert.present();
+	}
+
+	//  Realiza o processo de importação, recebendo a string JSON com todas as gameplays
+	public makeImportProcess(value: string){
+        try{
+            for(let stringObject of JSON.parse(value)){
+                let newGameplay: Gameplay = {
+                    gameId                : stringObject.gameId,
+                    gameName              : stringObject.gameName,
+                    gameCoverURL          : stringObject.gameCoverURL,
+                    name                  : stringObject.name,
+                    addingDate            : stringObject.addingDate,
+                    lastModifiedDate      : stringObject.lastModifiedDate,
+                    oldStatus             : stringObject.oldStatus,
+                    status                : stringObject.status,
+                    stagesCreated         : stringObject.stagesCreated,
+                    notes                 : stringObject.notes,
+                    stages                : [],
+                    historyItems          : []
+                };
+
+                newGameplay.stages = stringObject?.stages.map(stage => ({
+                    gameplay          : newGameplay,
+                    id                    : stage.id,
+                    name                  : stage.name,
+                    description           : stage.description,
+                    createdDate           : stage.createdDate,
+                    lastModifiedDateString: stage.lastModifiedDateString,
+                    lastModifiedDate      : stage.lastModifiedDate,
+                    status                : stage.status,
+                    oldStatus             : stage.oldStatus
+                }));
+
+                newGameplay.historyItems = stringObject?.historyItems.map(hist => ({
+                    play: newGameplay,
+                    type: hist.type,
+                    text: hist.text
+                }));
+
+                //  Adiciona nas gameplays já existentes
+                this.allGameplays.unshift(newGameplay);
+            }
+            
+            //  Atualiza o Storage
+            this.storage.set('gameplays', this.allGameplays);
+
+            //  Popula o Map das gameplays a serem exibidas
+            this.populateAllGameplaysToShowMap();
+
+            //  Exibe mensagem de sucesso
+            this.databaseService.showSuccessErrorToast(true, 'Sucesso ao importar!');
+
+        } catch (error){
+
+            //  Exibe mensagem de erro
+            this.databaseService.showSuccessErrorToast(false, 'Erro ao importar: ' + error);
+        }
+	}
+
     //  Retorna o conjunto atual de itens, dado o tipo de item, o status e o número da página atual
     public getSetOfItemsByTypeStatusPage(itemType: string, status: string, page: number): any[]{
         if(itemType == 'Gameplays'){
