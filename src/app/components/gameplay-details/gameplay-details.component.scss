@@ -39,6 +39,21 @@
     font-size: 20px;
 }
 
+//  FIltragem dos stages por progresso
+.segment-label-style{
+    font-family: "Londrina Solid", cursive;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #ffffffd1;
+}
+
+//  Estilo do filtro selecionado
+ion-segment-button{
+    --color-checked: #e7ff14;
+}
+
 //  Mensagem para nenhuma correspondência de busca - Card de exibição
 .no-results-card-style{
     margin-left: 10%;

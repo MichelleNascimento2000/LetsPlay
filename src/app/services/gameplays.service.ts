@@ -61,11 +61,23 @@ export class GameplaysService {
 	public currentStage: GameplayStage;
     
     //  Map com todas as fases da gameplay atual, separadas por Status e número da página de exibição
-    public builtStagesToShow: Map<String, GameplayStage[]> = new Map();
+    public builtStagesToShowMap: Map<String, Map<Number, GameplayStage[]>> = new Map();
 
     //  Map das fases do usuário a serem exibidas para a gameplay atual
-	public renderedGameplayStages: GameplayStage[] = [];
+	public renderedGameplayStagesMap: Map<Number, GameplayStage[]> = new Map();
     
+    //  Status da fase atualmente sendo filtrado
+	public chosenStageStatus: string = 'Todos';
+
+    //  Fases atualmente sendo filtradas pelo seu status
+	public currentFilteredStagesByStatus: GameplayStage[] = [];
+
+    //  Input de texto a ser usado para filtrar as fases
+	public stageTextInput: string;
+
+    //  Enum com os valores dos possíveis status de uma fase
+	public gameplayStageStatusOptionsEnum = GameplayStageStatusOptions;
+
 
     //  Cores dos estilos a serem usados nos cards das fases
     //  Fases "pares" serão verdes, e "ímpares" serão amarelas
@@ -632,7 +644,7 @@ export class GameplaysService {
     public async enterStageStatus(chosenStageName: string, chosenStageDescription: string) {
         
         //  O nome e a descrição enviados não podem estar vazios
-        if(!Boolean(chosenStageName) && !Boolean(chosenStageDescription)){
+        if(!Boolean(chosenStageName) || !Boolean(chosenStageDescription)){
             this.databaseService.showSuccessErrorToast(false, 'Você deve inserir valores antes de continuar!');
 			this.enterNameDescription();
             return;
@@ -701,17 +713,20 @@ export class GameplaysService {
         this.gameplayToShow.stages.unshift(stage)
 
         //  Carrega e organiza a paginação de todas as fases agora existentes para a gameplay
-        this.populateAllCurrentGameplayStages();
-
+        this.populateAllCurrentGameplayStagesMap();
+        
         //  Atualiza todas gameplays no Storage
         this.saveGameplaysToStorage();
+
+        //  Reaplicar filtragem por status e texto
+        this.applyStageStatusAndTextFilter();
 
         //  Exibe mensagem de sucesso
         this.databaseService.showSuccessErrorToast(true, 'Fase criada com sucesso!');
     }
 
     //  Carregar fases paginadas de acordo com cada status da fase da gameplay sendo exibida
-	public populateAllCurrentGameplayStages(){
+	public populateAllCurrentGameplayStagesMap(){
 
         //  Iterar por todos os status possíveis das fases
 		for(let status of Object.values(GameplayStageStatusOptions)){
@@ -720,37 +735,70 @@ export class GameplaysService {
 			this.resetBuiltStagesMap(status)
 			
             //  Popula o Map usando todas as fases existentes para a gameplay
-            this.builtStagesToShow.set(status, []);
-            for(let item of this.gameplayToShow.stages.filter(play => play.status == status)){
-                this.builtStagesToShow.get(status).push(item);
-            }
-
+			this.putItemsToMap(this.builtStagesToShowMap.get(status), this.gameplayToShow.stages.filter(play => play.status == status));
 		}
 		
         //  Cria conjunto separado para guardar todas as fases
-		this.builtStagesToShow.set('Todos', []);
-        for(let item of this.gameplayToShow.stages){
-            this.builtStagesToShow.get('Todos').push(item);
-		}
-
-        this.renderedGameplayStages = this.builtStagesToShow.get('Todos');
+		this.builtStagesToShowMap.set('Todos', new Map([
+			[1, []]
+		]));
+		this.putItemsToMap(this.builtStagesToShowMap.get('Todos'), this.gameplayToShow.stages);
 	}
 
     //  Resetar o Map de exibição das stages
     public resetBuiltStagesMap(status: string){
-        this.builtStagesToShow.set(status, []);
+        this.builtStagesToShowMap.set(status, new Map([
+            [1, []]
+        ]));
     }
+
+    //  Aplicar mudança de status e filtro de texto às fases sendo exibidas no momento
+	public applyStageStatusAndTextFilter(){
+
+        //  Se o filtro for diferente de "Todos"
+		if(this.chosenStageStatus != 'Todos'){
+
+            //  Filtrar fases que tenham o status escolhido no momento, e adicionar na lista
+			this.currentFilteredStagesByStatus = this.gameplayToShow.stages.filter(
+				stage => this.formatInput(stage.status) == this.formatInput(this.chosenStageStatus)
+			);
+		} else {
+
+            //  Se for todos, carregar todas as fases independente de status
+			this.loadGameplayStagesAllStatus();
+		}
+        //  Resetar páginas pois a filtragem precisa ser exibida da primeira página pra frente
+        this.resetPages();
+    
+        //  Resetar fases sendo exibidas no momento
+        this.resetRenderedStagesMap();
+        
+        //  Adicionar no Map de fases renderizadas os itens recém obtidos da filtragem
+        this.putItemsToMap(this.renderedGameplayStagesMap, this.currentFilteredStagesByStatus);
+	}
     
     //  Carregar todas as fases da gameplay em questão no Map de fases renderizadas
     public loadGameplayStagesAllStatus() {
 
+        //  Atribuir a lista puxada direto do registro da gameplay
+        this.currentFilteredStagesByStatus = this.gameplayToShow.stages;
+        this.putItemsToMap(this.renderedGameplayStagesMap, this.currentFilteredStagesByStatus);
+
+        //  Resetar páginas para sempre iniciar exibição pós mudança de tab pela página 1
+        this.resetPages();
+
         //  Preencher Map com todas as fases da gameplay atual
-        this.populateAllCurrentGameplayStages();
+        this.populateAllCurrentGameplayStagesMap();
+    }
+
+    //  Retorna o atual conjunto de fases de acordo com o status e texto filtrados, e a página atual
+    public resetRenderedStagesMap(){
+        return this.renderedGameplayStagesMap = new Map();
     }
 
     //  Retorna o atual conjunto de fases de acordo com o status e texto filtrados, e a página atual
     public getCurrentStagesSetToShow(){
-        return this.renderedGameplayStages;
+        return this.renderedGameplayStagesMap.get(this.currentPage);
     }
 
     //  Método chamado para que, a cada vez que a seção de anotações é modificada, a gameplay é atualizada no Storage
@@ -768,12 +816,17 @@ export class GameplaysService {
         if(itemType == 'Gameplays'){
             return this.renderedBuiltGameplaysToShowMap.get(status).get(page);
         }
+
+        if(itemType == 'Stages'){
+            return this.builtStagesToShowMap.get(status).get(page);
+        }
     }
 	
     //  Ir para próxima página
 	public forwardPage(pageType: string){
         const status = 
-            pageType == 'Gameplays' ? this.progressName : null;
+            pageType == 'Gameplays' ? this.progressName : 
+            pageType == 'Stages'    ? this.chosenStageStatus : null;
 
         const pageItems     = this.getSetOfItemsByTypeStatusPage(pageType, status, this.currentPage);
         const nextPageItems = this.getSetOfItemsByTypeStatusPage(pageType, status, this.currentPage + 1);
