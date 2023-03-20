@@ -1,0 +1,79 @@
+<ion-header>
+	<ion-toolbar class="header">
+		<ion-buttons slot="start">
+			<ion-back-button defaultHref='home'></ion-back-button>
+		</ion-buttons>
+
+        <!-- O título do cabeçalho indica o número da fase -->
+		<ion-title class="title">Stage - {{stage_to_show.id}}</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content class="background">
+
+    <!-- Mensagem de orientação para edição das informações da fase -->
+	<ion-card   class="info-style" 
+                [ngStyle]="{'--background': gameplaysService.allColorsMap.get(stage_to_show.id % 2 + 'TitleBackground')}">
+
+		<ion-text   class="card-input-style" 
+                    [ngStyle]="{'color': gameplaysService.allColorsMap.get(stage_to_show.id % 2 + 'Font')}"
+                    style="font-size: 20px;">Edite os dados desta fase conforme precisar!</ion-text>
+	</ion-card>
+
+    <!-- Título da fase -->
+	<ion-card   class="card-style" 
+                [ngStyle]="{'--background': gameplaysService.allColorsMap.get(stage_to_show.id % 2 + 'Background')}">
+
+		<ion-textarea autoGrow="true" type="text" placeholder="Nome" [(ngModel)]="insertedName" class="card-input-style" 
+                    [ngStyle]="{'color': gameplaysService.allColorsMap.get(stage_to_show.id % 2 + 'Font')}"
+                    style="font-size: 18px;" maxlength="50"></ion-textarea>
+	</ion-card>
+
+    <!-- Descrição da fase -->
+	<ion-card   class="card-style" 
+                [ngStyle]="{'--background': gameplaysService.allColorsMap.get(stage_to_show.id % 2 + 'Background')}">
+
+		<ion-textarea   autoGrow="true" placeholder="Descrição" [(ngModel)]="insertedDescription" class="card-input-style" 
+                        [ngStyle]="{'color': gameplaysService.allColorsMap.get(stage_to_show.id % 2 + 'Font')}"
+                        style="font-size: 18px;"></ion-textarea>
+	</ion-card>
+
+    <!-- Status da fase -->
+	<ion-radio-group color="none" style="padding: 0px;" name="status" 
+		[(ngModel)]="stage_to_show.status" 
+		(ngModelChange)="gameplaysService.confirmStageStatusChange(stage_to_show)">
+		<ion-item   *ngFor="let option of gameplaysService.gameplayStageStatusOptionsEnum | keyvalue: databaseService.originalOrder" 
+                    class="status-list-style" 
+                    [ngStyle]="{'--background': gameplaysService.allColorsMap.get(stage_to_show.id % 2 + 'Background')}">
+
+			<ion-label  class="status-list-label-style" 
+                        [ngStyle]="{'--color': gameplaysService.allColorsMap.get(stage_to_show.id % 2 + 'Font')}">{{option.value}}</ion-label>
+			<ion-radio value={{option.value}} [disabled]="stage_to_show.status == option.value"></ion-radio>
+		</ion-item>
+	</ion-radio-group>
+
+
+    <!-- Data de criação da fase -->
+	<ion-card   class="card-style" 
+                [ngStyle]="{'--background': gameplaysService.allColorsMap.get(stage_to_show.id % 2 + 'Background')}">
+                
+		<ion-text   class="card-input-style" 
+                    [ngStyle]="{'color': gameplaysService.allColorsMap.get(stage_to_show.id % 2 + 'Font')}"
+                    style="font-size: 12px;">Criado em: {{stage_to_show.createdDate}}</ion-text>
+	</ion-card>
+
+    <!-- Data da última modificação da fase -->
+	<ion-card   class="card-style" 
+                [ngStyle]="{'--background': gameplaysService.allColorsMap.get(stage_to_show.id % 2 + 'Background')}">
+
+		<ion-text   class="card-input-style" 
+                    [ngStyle]="{'color': gameplaysService.allColorsMap.get(stage_to_show.id % 2 + 'Font')}"
+                    style="font-size: 12px;">Modificado em: {{stage_to_show.lastModifiedDateString}}</ion-text>
+	</ion-card>
+
+    <!-- Botão de salvar alterações (exceto as de status) -->
+	<ion-button (click)="saveStage()" [disabled]="!areInputsDifferent()" class="save-button-style">
+		<ion-icon slot="start" name="save"></ion-icon>
+		&nbsp;&nbsp;Salvar
+	</ion-button>
+</ion-content>

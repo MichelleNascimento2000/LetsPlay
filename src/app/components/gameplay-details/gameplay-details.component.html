@@ -85,7 +85,7 @@
                     [ngStyle]="{'--background': this.gameplaysService.allColorsMap.get(stage.id % 2 + 'Background')}">
 			<ion-grid fixed>
 				<ion-row>
-					<ion-col size="10">
+					<ion-col size="10" (click)="gameplaysService.loadStage(stage)">
                         
                         <!-- ID da fase -->
 						<ion-text   class="card-input-style" 

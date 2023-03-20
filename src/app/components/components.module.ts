@@ -7,6 +7,7 @@ import { GameDetailsComponent } from './game-details/game-details.component';
 import { FilterDetailsComponent } from './filter-details/filter-details.component';
 import { GamesByProgressComponent } from './games-by-progress/games-by-progress.component';
 import { GameplayDetailsComponent } from './gameplay-details/gameplay-details.component';
+import { StageDetailsComponent } from './stage-details/stage-details.component';
 
 import { IonicModule } from '@ionic/angular';
 
@@ -17,12 +18,14 @@ import { IonicModule } from '@ionic/angular';
         FilterDetailsComponent,
         GamesByProgressComponent,
         GameplayDetailsComponent,
+        StageDetailsComponent
     ],
     exports: [
         GameDetailsComponent,
         FilterDetailsComponent,
         GamesByProgressComponent,
         GameplayDetailsComponent,
+        StageDetailsComponent
     ],
     imports: [
         CommonModule,

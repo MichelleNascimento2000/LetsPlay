@@ -1,0 +1,40 @@
+//  Lista de possíveis status
+.status-list-style{
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+//  Estilo da fonte da lista por status
+.status-list-label-style{
+    font-family: "Londrina Solid", cursive;
+    font-size: 16px;
+    padding: 0px;
+}
+
+//  Título de orientação do recurso de edição de stage
+.info-style{
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 15px;
+    margin-bottom: 30px;
+
+    padding: 5px;
+    text-align: center;
+}
+
+//  Botão de salvar alterações
+.save-button-style{
+    --background: var(--darker-purple);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-left: 30%;
+    margin-right: 30%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+
+    font-family: 'Londrina Solid', cursive; 
+    font-size: 25px;
+}

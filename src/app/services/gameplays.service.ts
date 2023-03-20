@@ -472,7 +472,7 @@ export class GameplaysService {
 			.replace('ü', 'u')
 			.replace('ñ', 'n');
 	}
-    
+
     //  Exibe mensagem de confirmação para mudança de status da gameplay
     public async confirmGameStatusChange(game: Gameplay) {
 
@@ -737,6 +737,9 @@ export class GameplaysService {
         //  Adiciona fase no topo da lista de todas as fases criadas para a gameplay
         this.gameplayToShow.stages.unshift(stage)
 
+        //  Redirecionar para a página de detalhes da fase recém criada
+        this.loadStage(stage);
+
         //  Carrega e organiza a paginação de todas as fases agora existentes para a gameplay
         this.populateAllCurrentGameplayStagesMap();
         
@@ -749,6 +752,13 @@ export class GameplaysService {
         //  Exibe mensagem de sucesso
         this.databaseService.showSuccessErrorToast(true, 'Fase criada com sucesso!');
     }
+
+    //  Seta a fase atual usando a fase recebida como parâmetro, e redireciona para tela de detalhes da fase
+	public loadStage(stage: GameplayStage) {
+		this.currentStage = stage;
+
+		this.router.navigate(['stages']);
+	}
 
     //  Carregar fases paginadas de acordo com cada status da fase da gameplay sendo exibida
 	public populateAllCurrentGameplayStagesMap(){
@@ -847,6 +857,105 @@ export class GameplaysService {
     public getCurrentStagesSetToShow(){
         return this.renderedGameplayStagesMap.get(this.currentPage);
     }
+
+    //  Exibir alert com mensagem de confirmação para mudança de status da fase
+	public async confirmStageStatusChange(stage: GameplayStage) {
+
+        //  Variáveis para controle do antigo e novo statuss
+		let newStatus = stage.status;
+		let oldStatus = stage.oldStatus;
+
+        //  Em caso de confirmação, seguir com a mudança
+		const alert = await this.alertController.create({
+			cssClass: 'base-alert-style',
+			message: `Você deseja mesmo mudar essa fase de "${stage.oldStatus}" para "${stage.status}"?`,
+			buttons: [
+				{
+					text: 'Sim',
+					handler: () => this.makeStageStatusChange(stage, newStatus)
+				},
+				{
+					text: 'Não'
+				}
+				
+			]
+		});
+
+        //  Atribui status atual com o antigo, após a mudança automática efetuada pelo próprio picklist
+        //  O status não deve mudar antes da confirmação do usuário
+		stage.status = oldStatus;
+
+		await alert.present();
+	}
+
+    //  Efetuar mudança de status da fase
+	public makeStageStatusChange(stage: GameplayStage, newStatus: GameplayStageStatusOptions){
+		stage.status    = newStatus;
+		stage.oldStatus = stage.status;
+
+        //  Atualizar data da última modificação da gameplay
+		this.updateStageLastModifiedDate(stage);
+
+		this.saveGameplaysToStorage();
+
+		this.databaseService.showSuccessErrorToast(true, 'Status da fase alterado com sucesso!');
+	}
+
+    //  Atualizar data da última modificação, e reordenar todas as fases com base nessa data
+    public updateStageLastModifiedDate(stage: GameplayStage){
+        stage.lastModifiedDateString = new Date().toLocaleString('pt-BR', this.databaseService.dateTimeFormat);
+
+        //  Atualizar a última modificação da gameplay também
+        this.updateGameplayLastModifiedDate(stage.gameplay);
+
+        //  Reordenação para exibir primeiro as modificadas mais recentemente
+        this.reorderStagesByDate(stage);
+
+        //  Reorganizar as fases das gameplays do status atual
+        this.populateAllCurrentGameplayStagesMap();
+
+        //  Reaplicar filtragem por status e texto
+        this.applyStageStatusAndTextFilter();
+    }
+
+    //  Reordenação das fases da gameplay atual para inserir as com modificação mais recente primeiro
+    //  Aplicação do Bubble Sort
+	public reorderStagesByDate(stage: GameplayStage){
+		
+        //  Todas as fases da gameplay atual
+        let allStages = stage.gameplay.stages;
+        
+        //  Tamanho do array de gameplays
+        let length = allStages.length;
+		
+        //  Controle para ordenação cessar
+		let isNotInOrder = true;
+        
+		while(isNotInOrder){
+			isNotInOrder = false;
+
+            //  Do primeiro até o penúltimo
+			for(let i = 0; i < length - 1; i++){
+
+                //  Do segundo até o último
+				for(let j = i + 1; j < length; j++){
+                    
+                    //  Comparar se todos os pares de elementos possíveis precisam ser trocados de posição
+					if(allStages[i].lastModifiedDate < allStages[j].lastModifiedDate){
+
+                        //  Troca de posição
+						let auxI = allStages[i];
+						let auxJ = allStages[j];
+						allStages[i] = auxJ;
+						allStages[j] = auxI;
+
+                        //  Será necessário refazer a varredura mais uma vez para garantir a ordenação total
+						isNotInOrder = true;
+					}
+				}
+			}
+		}
+	}
 
     //  Exibe alert de confirmação para deleção da fase
 	public async confirmStageDeletion(stage: GameplayStage){
