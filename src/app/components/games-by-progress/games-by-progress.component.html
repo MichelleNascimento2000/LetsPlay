@@ -31,7 +31,7 @@
             <ion-row>
 
                 <!-- Nome da gameplay -->
-				<ion-col size="10">
+				<ion-col size="10" (click)="redirectToChosenGameplay(gameplay)">
 					<ion-card class="gameplay-name-card-style">
 						<ion-text>{{gameplay.name}}<br></ion-text>
 					</ion-card>
@@ -47,7 +47,7 @@
 			</ion-row>
 
 			<ion-row>
-				<ion-col size="4">
+				<ion-col size="4" (click)="redirectToChosenGameplay(gameplay)">
 
                     <!-- Nome do jogo -->
 					<ion-row>
@@ -92,7 +92,7 @@
 							</ion-item>
 
                             <!-- Espaçamento (que também redireciona para a gameplay) -->
-							<ion-item color="none" style="margin-bottom: 10px;"></ion-item>
+							<ion-item color="none" style="margin-bottom: 10px;" (click)="redirectToChosenGameplay(gameplay)"></ion-item>
 
                             <!-- Redirecionar para informações do jogo -->
 							<ion-item class="game-info-style" (click)="databaseService.redirectToGameDetails(gameplay.gameId)">

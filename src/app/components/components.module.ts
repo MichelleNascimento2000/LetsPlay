@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { GameDetailsComponent } from './game-details/game-details.component';
 import { FilterDetailsComponent } from './filter-details/filter-details.component';
 import { GamesByProgressComponent } from './games-by-progress/games-by-progress.component';
+import { GameplayDetailsComponent } from './gameplay-details/gameplay-details.component';
 
 import { IonicModule } from '@ionic/angular';
 
@@ -14,12 +15,14 @@ import { IonicModule } from '@ionic/angular';
     declarations: [
         GameDetailsComponent,
         FilterDetailsComponent,
-        GamesByProgressComponent
+        GamesByProgressComponent,
+        GameplayDetailsComponent,
     ],
     exports: [
         GameDetailsComponent,
         FilterDetailsComponent,
-        GamesByProgressComponent
+        GamesByProgressComponent,
+        GameplayDetailsComponent,
     ],
     imports: [
         CommonModule,

@@ -120,3 +120,10 @@ export enum GameplayStatusOptions {
     Jogando   = 'Jogando',
     Concluido = 'Concluído'
 }
+
+//  Aplicação - Enum com as seções navegáveis dentro de uma gameplay
+export enum GameplayDetailsSections {
+    Notas     = 'Notas',
+    Fases     = 'Fases',
+    Historico = 'Histórico'
+}

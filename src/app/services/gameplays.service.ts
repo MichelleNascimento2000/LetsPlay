@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { APIGame, Game, Gameplay, GameplayStatusOptions } from '../models/API-Models';
+import { APIGame, Game, Gameplay, GameplayDetailsSections, GameplayStatusOptions } from '../models/API-Models';
 import { AlertController, AlertInput } from '@ionic/angular';
 import { DatabaseService } from './database.service';
 import { Storage } from '@ionic/storage';
@@ -45,6 +45,18 @@ export class GameplaysService {
 
     //  Variáveis de controle para parametrizar a função do botão de retornar da página de detalhes de um jogo
     public comingFromSearch: Boolean = false;
+    
+    
+    
+    //  Gameplay sendo exibida no momento
+    public gameplayToShow: Gameplay;
+    
+    //  Seção da página de detalhes da gameplay sendo exibida no momento
+    public gameplayDetailsSection: string = 'Fases';
+    
+    //  Enum com os valores das possíveis seções da página de detalhes de gameplay, para exibição das tabs
+    public gameplayDetailsSectionsEnum = GameplayDetailsSections;
+    
 
     //  Carregar informações dos jogos contidos dentre as gameplays salvas pelo usuário
     public async getGameplaysInfoFromAPI(){
@@ -550,6 +562,15 @@ export class GameplaysService {
     //  Campo de controle para apontar qual é a página pela qual a página de gameplays foi acessada
 	public setComingFromSearch(comingFromSearch){
 		this.comingFromSearch = comingFromSearch;
+	}
+
+
+
+
+    //  Carregar seção especificada da página de detalhes da gameplay
+    public loadGameplayDetailsSection(gameplayDetailsSection: string) {
+		this.resetPages();
+		this.gameplayDetailsSection = gameplayDetailsSection;
 	}
 
     //  Retorna o conjunto atual de itens, dado o tipo de item, o status e o número da página atual

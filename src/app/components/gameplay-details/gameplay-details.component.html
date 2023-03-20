@@ -1,0 +1,40 @@
+<ion-header>
+	<ion-toolbar class="header">
+		<ion-buttons slot="start">
+			<ion-back-button defaultHref='gameplays/playing-games'></ion-back-button>
+		</ion-buttons>
+
+        <!-- Exibe nome da gameplay no cabeçalho -->
+		<ion-title class="title">{{gameplay_to_show.name}}</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content class="background">
+	<ion-grid fixed>
+		<ion-row>
+
+            <!-- Espaçamento -->
+			<ion-col size="3"></ion-col>
+
+			<ion-col size="6"  (click)="databaseService.redirectToGameDetails(gameplay_to_show.gameId)">
+
+                <!-- Nome do jogo -->
+				<ion-row>
+					<ion-card class="name-card-style">
+						<ion-text>{{gameplay_to_show.gameName}}<br></ion-text>
+					</ion-card>
+				</ion-row>
+
+                <!-- Imagem do jogo -->
+				<ion-row>
+					<ion-img [src]="gameplay_to_show.gameCoverURL" class="cover-style" style="width: 90px; height: 90px; border-width: 2px;"></ion-img>
+				</ion-row>
+
+			</ion-col>
+
+            <!-- Espaçamento -->
+			<ion-col size="3"></ion-col>
+
+		</ion-row>
+	</ion-grid>
+</ion-content>

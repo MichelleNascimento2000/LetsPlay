@@ -22,4 +22,10 @@ export class GamesByProgressComponent implements OnInit {
         //  Redireciona para a aba "Jogando" ao chegar na página pela primeira vez
 		this.gameplaysService.reassignProgressAndRepopulateGameplays('Jogando');
 	}
+
+    //  Redirecionar para a gameplay selecionada
+	public redirectToChosenGameplay(gameplay: Gameplay){
+		this.gameplaysService.gameplayToShow = gameplay;
+		this.router.navigate(['gameplay-focusing/play']);
+	}
 }
