@@ -99,7 +99,7 @@
 			<ion-col size="2">
 
                 <!-- Adicionar jogo à lista de Jogatinas -->
-				<ion-button class="add-game-button-style">
+				<ion-button class="add-game-button-style" (click)="this.gameplaysService.confirmGameAdding(game_to_show)">
 					<ion-icon slot="icon-only" name="add"></ion-icon>
 				</ion-button>
 
@@ -107,7 +107,7 @@
 			<ion-col size="2">
 
                 <!-- Símbolo de aviso caso jogo já tenha sido adicionado -->
-				<ion-card class="warning-card-style">
+				<ion-card class="warning-card-style" *ngIf="this.gameplaysService.isGameAlreadyAdded(game_to_show.id)">
 					<ion-text>
 						<ion-img src="./assets/images/warning.png"></ion-img>
 					</ion-text>
