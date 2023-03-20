@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 
 import { GameDetailsComponent } from './game-details/game-details.component';
 import { FilterDetailsComponent } from './filter-details/filter-details.component';
-import { GamesByProgressComponent } from '../games-by-progress/games-by-progress.component';
+import { GamesByProgressComponent } from './games-by-progress/games-by-progress.component';
 
 import { IonicModule } from '@ionic/angular';
 
