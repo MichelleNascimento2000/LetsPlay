@@ -251,13 +251,16 @@ export class GameplaysService {
 			stages                : [],
             stagesCreated         : 0,
             notes                 : ''
-        };
+		};
 
         //  Adiciona jogo em questão no Map de jogos carregados via gameplays
         this.databaseService.gameplayBuiltGames.set(game.id, game);
 
         //  Adiciona gameplay na lista de gameplays, e no topo de todas
         this.allGameplays.unshift(gameplay);
+
+        //  Reordena a paginação do status que teve a gameplay recém adicionada
+		this.reorderMapByStatus(chosenStatus);
 
         //  Salvar a lista de gameplays atualizadas no Storage
         this.saveGameplaysToStorage();
@@ -268,6 +271,22 @@ export class GameplaysService {
         //  Exibir Toast de sucesso
         this.databaseService.showSuccessErrorToast(true, 'Gameplay criada com sucesso!');
     }
+
+    //  Reordena a paginação das gameplays dentro do status especificado
+    public reorderMapByStatus(status: string){
+
+        //  O método começará pelo primeiro item
+		this.resetItemPositionForMakingMap();
+		
+        //  Inicializa o Map com a lista vazia para a primeira página
+		this.resetBuiltGameplaysMap(status);
+
+        //  Chama método para reorganizar a paginação da atual lista de gameplays para o status especificado
+		this.putItemsToMap(this.builtGameplaysToShowMap.get(status), this.allGameplays.filter(play => play.status == status));
+
+        //  Popula Map de gameplays renderizadas na página com o Map total atualizado
+		this.renderedBuiltGameplaysToShowMap = new Map(this.builtGameplaysToShowMap);
+	}
 
     //  Salvar lista de todas as gameplays no Storage
     //  Caso o parâmetro venha null, considerar a lista de todas as gameplays
@@ -351,8 +370,14 @@ export class GameplaysService {
         //  Atualiza variável que guarda o progresso atual
 		this.progressName = progressName;
 
+        //  Volta para a página inicial
+		this.resetPages();
+
         //  Carrega as gameplays a serem renderizadas
 		this.populateAllGameplaysToShowMap();
+
+        //  Aplica filtro por nome
+		this.searchGameplayByTextInput();
 	}
 
     //  Popula o Map com todas as gameplays do usuário, e carrega o Map de exibição na tela filtrando por status e página
