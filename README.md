@@ -1,6 +1,10 @@
 ## Let's Play 🎮🕹
 
-▶ Este projeto se trata de uma aplicação para busca de jogos e gerenciamento de gameplays. A aplicação faz uso da API RAWG para recuperar as informações dos jogos, tornando possível a busca usando-se de filtros como nome, gêneros, plataformas, empresas, data de lançamento e nota. A partir desta busca, é possível criar registros de gameplays tomando como base os jogos. Cada gameplay pode ter um status específico, além de um campo de anotações livres para o usuário e uma lista para criar fases personalizadas para cada gameplay. O usuário pode usar as fases da forma que bem entender, para registrar a necessidade de completude de um mundo, de um boss, ou qualquer outro recurso do jogo. A aplicação também registra em cada gameplay um histórico para salvar data e hora de ações como a criação da própria gameplay, as mudanças de seu status, a criação de uma fase nova, e etc.
+▶ Este projeto se trata de uma aplicação para busca de jogos e gerenciamento de gameplays. A aplicação faz uso da API RAWG para recuperar as informações dos jogos, tornando possível a busca usando-se de filtros como nome, gêneros, plataformas, empresas, data de lançamento e nota. 
+
+▶ A partir desta busca, é possível criar registros de gameplays tomando como base os jogos. Cada gameplay pode ter um status específico, além de um campo de anotações livres para o usuário e uma lista para criar fases personalizadas para cada gameplay. O usuário pode usar as fases da forma que bem entender, para registrar a necessidade de completude de um mundo, de um boss, ou qualquer outro recurso do jogo. 
+
+▶ A aplicação também registra em cada gameplay um histórico para salvar data e hora de ações como a criação da própria gameplay, as mudanças de seu status, a criação de uma fase nova, e etc.
 
 ▶ Projeto desenvolvido em Ionic 5/Angular.
 
