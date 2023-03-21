@@ -20,7 +20,7 @@ export class GameSearchingPage implements OnInit {
         );
         
         //  Se não encontrar na lista principal, busca pela lista exclusiva de jogos das gameplays existentes
-        if(this.game == null){
+        if (this.game == null) {
             this.game = Array.from(this.databaseService.gameplayBuiltGames.values()).find(
                 builtGame => builtGame.id == +this.idValue
             );

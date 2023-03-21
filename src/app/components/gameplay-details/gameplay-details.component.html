@@ -75,7 +75,7 @@
 		</ion-segment>
 
         <!-- Exibição para quando não há fases para exibir -->
-		<ion-card *ngIf="gameplaysService.getCurrentStagesSetToShow().length == 0" class="no-results-card-style">
+		<ion-card *ngIf="!gameplaysService.getCurrentStagesSetToShow().length" class="no-results-card-style">
 			<ion-text class="no-results-input-style">Sem resultados!</ion-text>
 		</ion-card>
 

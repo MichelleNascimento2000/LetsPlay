@@ -34,7 +34,8 @@ const routes: Routes = [
     {
         path: 'gameplay-focusing',
         loadChildren: () => import('./gameplay-focusing/gameplay-focusing.module').then(m => m.GameplayFocusingPageModule)
-    },  {
+    },
+  {
     path: 'stages',
     loadChildren: () => import('./stages/stages.module').then( m => m.StagesPageModule)
   }

@@ -25,7 +25,7 @@ export class HomePage {
 	async ngOnInit(){
         
         //  Evitar recursão de execução mais de uma vez do OnInit
-		if(!this.databaseService.haveAppOpened){
+		if (!this.databaseService.haveAppOpened) {
 			await this.createLoading('Aguarde...');
 			this.presentLoading();
 
@@ -33,11 +33,11 @@ export class HomePage {
             await this.databaseService.getAllGenresFromAPI();
             await this.databaseService.getAllPlatformsFromAPI();
                 
-            try{
+            try {
                 await this.storage.get('gameplays').then(
                     gameplay => this.gameplaysService.allGameplays.push(...gameplay)
                 );
-            } catch (error){}
+            } catch (error) {}
 				
             await this.gameplaysService.populateAllGameplaysToShowMap();
 
@@ -60,12 +60,12 @@ export class HomePage {
 	}
 
     //  Redirecionar para a página de busca de jogos
-    public redirectToGameSearching(){
+    public redirectToGameSearching() : void {
 		this.router.navigate(['search']);
 	}
 
     //  Redirecionar para página de jogatinas
-	public redirectToMyGameplays(){
+	public redirectToMyGameplays() : void {
 		this.gameplaysService.setComingFromSearch(false);
 		this.router.navigate(['gameplays/playing-games']);
 	}
@@ -75,7 +75,7 @@ export class HomePage {
 	public loading: HTMLIonLoadingElement;
 
     //  Criar o loading
-	public async createLoading(messageToShow: string){
+	public async createLoading(messageToShow: string) : Promise<void> {
 		this.loading = await this.loadingController.create({
 			message : messageToShow,
 			cssClass: 'loading-info-style'
@@ -83,12 +83,12 @@ export class HomePage {
 	}
 
     //  Fechar o loading
-	public async dismissLoading(){
+	public async dismissLoading() : Promise<void> {
 		this.loading.dismiss();
 	}
 
     //  Mostrar o loading
-	public async presentLoading(){
+	public async presentLoading() : Promise<void> {
 		await this.loading.present();
 	}
 }

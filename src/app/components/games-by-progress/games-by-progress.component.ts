@@ -24,7 +24,7 @@ export class GamesByProgressComponent implements OnInit {
 	}
 
     //  Redirecionar para a gameplay selecionada
-	public redirectToChosenGameplay(gameplay: Gameplay){
+	public redirectToChosenGameplay(gameplay: Gameplay) : void {
 		this.gameplaysService.gameplayToShow = gameplay;
 		this.router.navigate(['gameplay-focusing/play']);
 	}

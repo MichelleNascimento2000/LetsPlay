@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { FilterOption, FilterOptionsParams, Filters } from '../models/API-Models';
 import { DatabaseService } from './database.service';
 import { Router } from '@angular/router';
+import { Platform } from '@ionic/angular';
 
 @Injectable({
     providedIn: 'root'
@@ -10,8 +11,9 @@ export class FiltersService {
 
     constructor(
 		public databaseService: DatabaseService,
-		public router         : Router
-        ){}
+		public router         : Router,
+        public platform       : Platform
+    ){}
         
     //  Variável para guardar a categoria de filtro que está sendo atualmente configurada
 	public currentFilterName: string;
@@ -91,47 +93,47 @@ export class FiltersService {
     public filterOptionsParamsMap = new Map<Filters, FilterOptionsParams>();
 
     //  Retornar parâmetros específicos de um filtro
-    public getCurrentFilterOptionsParams(filterName: string){
+    public getCurrentFilterOptionsParams(filterName: string) : FilterOptionsParams {
         return this.filterOptionsParamsMap.get(filterName as Filters);
     }
 
     //  Popular Map de parametrizações dos filtros
-    public populateFiltersOptionsMap(){
+    public populateFiltersOptionsMap() : void {
         this.filterOptionsParamsMap = new Map<Filters, FilterOptionsParams>([
             [Filters.Generos,
                 {
-                    query: '',
-                    concatParam: '&genres=',
+                    query: ``,
+                    concatParam: `&genres=`,
                     options: [],
                     apiValues: this.databaseService.allGenres
                 }
             ],
             [Filters.Plataformas,
                 {
-                    query: '',
-                    concatParam: '&platforms=',
+                    query: ``,
+                    concatParam: `&platforms=`,
                     options: [],
                     apiValues: this.databaseService.allPlatforms
                 }
             ],
             [Filters.Empresas,
                 {
-                    query: '',
-                    concatParam: '&developers=',
+                    query: ``,
+                    concatParam: `&developers=`,
                     options: []
                 }
             ],
             [Filters.Nota,
                 {
-                    query: '',
-                    concatParam: '&metacritic=',
+                    query: ``,
+                    concatParam: `&metacritic=`,
                     useFilter: false
                 }
             ],
             [Filters.DataLancamento,
                 {
-                    query: '',
-                    concatParam: '&dates=',
+                    query: ``,
+                    concatParam: `&dates=`,
                     useFilter: false
                 }
             ]
@@ -139,7 +141,7 @@ export class FiltersService {
     }
 
     //  Iniciar página de filtros
-	public async startFiltersPage(filterName: string){
+	public async startFiltersPage(filterName: string) : Promise<void> {
         this.allCurrentOptions = [];
 		this.optionsToShow = [];
         
@@ -159,7 +161,7 @@ export class FiltersService {
 
             case Filters.Empresas:
                 const selectedCompanyOptions: FilterOption[] = currentOptions.filter(option => option.selected);                
-                if(selectedCompanyOptions.length == 0){
+                if (!selectedCompanyOptions.length) {
 
                     //  Buscar dinamicamente devido a volume
                     await this.databaseService.getCompaniesFromAPIForFilter(null);
@@ -205,8 +207,8 @@ export class FiltersService {
 	}
 
     //  Criar opções buildadas de filtro
-    public buildFilterOptions(listToAdd: FilterOption[], allData: any[]){
-		if(listToAdd.length == 0){
+    public buildFilterOptions(listToAdd: FilterOption[], allData: any[]) : FilterOption[] {
+		if (!listToAdd.length) {
             listToAdd.push(...allData.map(option => ({
                 preSelected: false,
                 selected   : false,
@@ -218,7 +220,7 @@ export class FiltersService {
 	}
     
     //  Atualiza array com opções a serem exibidas
-	public setOptionsToShow(optionList: FilterOption[]): void{
+	public setOptionsToShow(optionList: FilterOption[]): void {
 
         //  Adicionar opções selecionadas primeiro para ficarem no topo, e dar melhor visualização
 		this.optionsToShow = [
@@ -229,23 +231,29 @@ export class FiltersService {
 
     //  Setar campo de "pré-selecionado" com o valor do "selecionado"
     //  Indicar se o filtro foi usado na busca recém realizada
-    public setPreselected(){
+    public setPreselected() : void {
         this.optionsToShow    .forEach(option => option.preSelected = option.selected);
         this.allCurrentOptions.forEach(option => option.preSelected = option.selected);
     }
 
     //  Setar campo de "selecionado" com o valor do "pré-selecionado"
     //  Ajustar visualização ao retornar para a página do filtro, para exibir apenas os aplicados e não os selecionados sem aplicação
-    public resetSelectionsOnReturnToSearch(){
+    public resetSelectionsOnReturnToSearch() : void {
         this.optionsToShow    .forEach(option => option.selected = option.preSelected);
         this.allCurrentOptions.forEach(option => option.selected = option.preSelected);
 
         this.hasFoundValue = true;
-        this.searchValue = '';
+        this.searchValue = ``;
     }
 
+    ionViewDidEnter() {
+        this.platform.backButton.subscribeWithPriority(10, () => {
+          console.log('Back button pressed!');
+        });
+      }
+
     //  Aplicar fitros e buscar jogos correspondentes
-	public async searchGames(filterName: string){
+	public async searchGames(filterName: string) : Promise<void> {
 		this.databaseService.resetPages();
 		this.databaseService.resetShownGameplays();
         this.databaseService.resetHasReachedMaxPages();
@@ -253,21 +261,21 @@ export class FiltersService {
         this.databaseService.pageIndexParam = 1;
 
         //  Texto com todos os IDs dos elementos do filtro para busca na API
-		let allIdsQuery = '';
+		let allIdsQuery = ``;
 		const allIdsArray = [];
 
         this.setPreselected();
         
         //  Para o filtro de Empresas, buscar pelas opções carregadas em tempo de execução
         //  Para as demais, buscar por todas as opções presentes
-        if(filterName == Filters.Empresas){
+        if (filterName == Filters.Empresas) {
             allIdsArray.push(...this.optionsToShow.filter(option => option.preSelected).map(option => option.value));
         } else {
             allIdsArray.push(...this.allCurrentOptions.filter(option => option.preSelected).map(option => option.value));
         }
-        allIdsQuery = allIdsArray.join(',');
+        allIdsQuery = allIdsArray.join(`,`);
         
-		if(!this.isResettingFilters){
+		if (!this.isResettingFilters) {
             const currentFilterParams: FilterOptionsParams = this.getCurrentFilterOptionsParams(filterName);
             const currentParam       : string              = currentFilterParams.concatParam;
 
@@ -277,14 +285,14 @@ export class FiltersService {
                 case Filters.Empresas:                    
 
                     //  Concatenar com termo de filtro da categoria específica, e com os IDs
-                    currentFilterParams.query = allIdsQuery != '' ? (currentParam + allIdsQuery) : '';
+                    currentFilterParams.query = Boolean(allIdsQuery) ? `${currentParam}${allIdsQuery}` : ``;
                     break;
 
                 case Filters.Nota:
 
                     //  Recuperar notas entradas pelo usuário
-                    const minimumRating = this.ratingsInputMap.get('Minimum').rat;
-                    const maximumRating = this.ratingsInputMap.get('Maximum').rat;
+                    const minimumRating = this.ratingsInputMap.get(`Minimum`).rat;
+                    const maximumRating = this.ratingsInputMap.get(`Maximum`).rat;
 
                     currentFilterParams.query = `${currentParam}${minimumRating},${maximumRating}`;
                     
@@ -298,8 +306,8 @@ export class FiltersService {
                 case Filters.DataLancamento:
 
                     //  Recuperar datas entradas pelo usuário
-                    const minDateMap = this.datesInputMap.get('Minimum');
-                    const maxDateMap = this.datesInputMap.get('Maximum');
+                    const minDateMap = this.datesInputMap.get(`Minimum`);
+                    const maxDateMap = this.datesInputMap.get(`Maximum`);
 
                     const fromDate = `${minDateMap.year}-${minDateMap.month.toString().padStart(2, '0')}-${minDateMap.day.toString().padStart(2, '0')}`;
                     const toDate   = `${maxDateMap.year}-${maxDateMap.month.toString().padStart(2, '0')}-${maxDateMap.day.toString().padStart(2, '0')}`;
@@ -319,25 +327,25 @@ export class FiltersService {
         //  Buscar pelos jogos
 		this.databaseService.getGamesFromAPI(this.databaseService.getBuiltQueryURL());
 
-		this.router.navigate(['search']);
+		this.router.navigate([`search`]);
 		
-		this.searchValue = '';
+		this.searchValue = ``;
 	}
 
     //  Montar parâmetro WHERE da API, usado para aplicar os filtros
     public writeCurrentWhere(): void {
-        this.databaseService.currentWhere = '';
+        this.databaseService.currentWhere = ``;
         this.filterOptionsParamsMap.forEach(param => this.databaseService.currentWhere += param.query);
     }
 
     //  Retorna se um filtro está sendo utilizado
-	public isChosenFilterBeingUsed(filterName: string): boolean{
+	public isChosenFilterBeingUsed(filterName: string): boolean {
         const currentFilterParams: FilterOptionsParams = this.filterOptionsParamsMap.get(filterName as Filters);
 		
         //  Se tiver lista com opções, é Gêneros, Plataformas ou Empresas
         //  Olhar se há opções selecionadas
-        if(currentFilterParams.options){
-            return currentFilterParams.options.filter(option => option.selected).length != 0;
+        if (currentFilterParams.options) {
+            return !!currentFilterParams.options.filter(option => option.selected).length;
         }
         
         //  Se não houver lista com opções, é Nota ou Data
@@ -346,13 +354,13 @@ export class FiltersService {
 	}
 
     //  Resetar filtro individual
-	public resetFilter(filterName: string, isAll: boolean){
+	public resetFilter(filterName: string, isAll: boolean) : void {
 		this.isResettingFilters = true;
         const currentFilterParams: FilterOptionsParams = this.getCurrentFilterOptionsParams(filterName);
         
         //  Resetar query, opções e flag de controle de uso
         //  Ou o filtro possui a lista com opções, ou possui a flag de controle
-        currentFilterParams.query = '';
+        currentFilterParams.query = ``;
         if(currentFilterParams.options){
             this.unselectOptions(currentFilterParams.options);
         } else {
@@ -360,7 +368,7 @@ export class FiltersService {
         }
 
         //  Ao resetar filtro individual, fazer nova busca pelos jogos usando o filtro resetado
-        if(!isAll){
+        if (!isAll) {
             this.searchGames(filterName);
         }
 
@@ -369,7 +377,7 @@ export class FiltersService {
 
     //  Resetar todos os filtros
 	public resetAllFilters(){
-		this.databaseService.inputName = '';
+		this.databaseService.inputName = ``;
 
         //  Itera sobre todos os tipos de filtro, e reseta cada um individualmente
         Object.values(Filters).forEach(filter => this.resetFilter(filter, true));
@@ -379,13 +387,13 @@ export class FiltersService {
 	}
 
     //  Desmarcar opções passadas como parâmetros
-	public unselectOptions(options: FilterOption[]){
+	public unselectOptions(options: FilterOption[]) : void {
         options.forEach(opt => opt.selected = false);
 	}
 
     //  Buscar opção de filtro por nome
-	public async search(filterName: string){
-        if(!Boolean(this.searchValue)){
+	public async search(filterName: string) : Promise<void> {
+        if (!Boolean(this.searchValue)) {
             
             //  Reseta exibição da página caso o usuário não busque por nada
             this.startFiltersPage(filterName);
@@ -428,7 +436,7 @@ export class FiltersService {
             //  A busca por empresas deve ser dinâmica devido ao volume
             await this.databaseService.getCompaniesFromAPIForFilter(this.searchValue);
             
-            for(const company of this.databaseService.searchedCompanies){
+            for (const company of this.databaseService.searchedCompanies) {
                 const opt: FilterOption = {
                     preSelected: false,
                     selected   : false,
@@ -440,12 +448,12 @@ export class FiltersService {
                 const options = this.filterOptionsParamsMap.get(Filters.Empresas).options;
 
                 //  Para cada empresa da API encontrada, se a lista de todas não possuir, deve adicionar
-                if(!options.find(option => option.name.includes(company.name))){
+                if (!options.find(option => option.name.includes(company.name))) {
                     options.push(opt);
                 }
 
                 //  Adicionar apenas opções que não estejam dentre as já selecionadas, pois estas estão fixadas no topo da exibição
-                if(!options.find(option => option.name.includes(company.name)).selected){
+                if (!options.find(option => option.name.includes(company.name)).selected) {
                     this.optionsToShow.push(opt);
                 }
             }
@@ -455,78 +463,74 @@ export class FiltersService {
 	}
 
     //  Resetar opções sendo exibidas
-	public resetOptionsToShow(filterName: string): void{
+	public resetOptionsToShow(filterName: string): void {
 		this.optionsToShow = [];
         this.setOptionsToShow(this.filterOptionsParamsMap.get(filterName as Filters).options.filter(option => option.selected));
 	}
 
     //  Controle para setar layout de filtros de opções de texto na tela
-	public isFilterWordList(filterName: string){
+	public isFilterWordList(filterName: string) : boolean {
 		return [
-			'Gêneros',
-			'Plataformas',
-			'Empresas'
+			`Gêneros`,
+			`Plataformas`,
+			`Empresas`
 		].includes(filterName);
 	}
 
     //  Controle para setar layout de filtro númérico na tela
 	public isFilterNumberRange(filterName: string){
-		return filterName == 'Nota';
+		return filterName == `Nota`;
 	}
 
     //  Controle para setar layout de filtro de data na tela
 	public isFilterDate(filterName: string){
-		return filterName == 'Data de lançamento';
+		return filterName == `Data de lançamento`;
 	}
 
     //  Validar input de nota
-	public validateRatingInput(){
+	public validateRatingInput() : void {
         const minimumRating = this.ratingsInputMap.get('Minimum').rat;
         const maximumRating = this.ratingsInputMap.get('Maximum').rat;
         
         //  Não pode estar vazio
 		if(!minimumRating || !maximumRating){
-			this.throwNoTextFilterError('Nota', 'Digite um valor para continuar!');
+			this.throwNoTextFilterError(`Nota`, `Digite um valor para continuar!`);
             return;
 		}
         
         //  Não pode exceder o limite de valores presentes na API, que é entre 49 e 100
         if(maximumRating > 100 || maximumRating < 49 || minimumRating > 100 || minimumRating < 49){
-			this.throwNoTextFilterError('Nota', 'Digite um valor entre 49 e 100!');
+			this.throwNoTextFilterError(`Nota`, `Digite um valor entre 49 e 100!`);
             return;
 		}
 
         //  Não pode ter o valor máximo como menor que o mínimo
         if(maximumRating < minimumRating){
-			this.throwNoTextFilterError('Nota', 'O valor mínimo deve ser menor do que o máximo!');
+			this.throwNoTextFilterError(`Nota`, `O valor mínimo deve ser menor do que o máximo!`);
             return;
 		}
 
-        this.removeNoTextFilterError('Nota');
+        this.removeNoTextFilterError(`Nota`);
 	}
 
     //  Buildar as datas usando o input do usuário, e setando nas variáveis correspondentes
-	public buildDates(){
+	public buildDates() : void {
         const minimumDate = this.datesInputMap.get('Minimum');
         const maximumDate = this.datesInputMap.get('Maximum');
 
-		this.builtDatesMap.set('Minimum', new Date(
-            minimumDate.year + '-' +
-            minimumDate.month + '-' +
-            minimumDate.day
+		this.builtDatesMap.set(`Minimum`, new Date(
+            `${minimumDate.year}-${minimumDate.month}-${minimumDate.day}`
         ));
 
-		this.builtDatesMap.set('Maximum', new Date(
-            maximumDate.year + '-' +
-            maximumDate.month + '-' +
-            maximumDate.day
+		this.builtDatesMap.set(`Maximum`, new Date(
+            `${maximumDate.year}-${maximumDate.month}-${maximumDate.day}`
         ));
 	}
 
     //  Validar se as datas entradas pelo usuário são válidas
     public isDateValidInGeneral(){
-        const minimumDateMap = this.datesInputMap.get('Minimum');
-        const maximumDateMap = this.datesInputMap.get('Maximum');
+        const minimumDateMap = this.datesInputMap.get(`Minimum`);
+        const maximumDateMap = this.datesInputMap.get(`Maximum`);
 
         const maxDaysInMonthMin =   this.isLeapYear(minimumDateMap.year)
                                     ? this.MAX_DAYS_IN_MONTH_LEAP_YEAR
@@ -556,7 +560,7 @@ export class FiltersService {
                                 isValidYear (maximumDateMap.year);
 
         if(!isMinimumValid || !isMaximumValid){
-            this.throwNoTextFilterError('Data de lançamento', 'Data inválida!');
+            this.throwNoTextFilterError(`Data de lançamento`, `Data inválida!`);
             return false;
         }
         
@@ -564,17 +568,17 @@ export class FiltersService {
         this.buildDates();
         
         //  Validar se a data mínima é menor do que a máxima
-        if((this.builtDatesMap.get('Minimum').getTime() > this.builtDatesMap.get('Maximum').getTime())){
-			this.throwNoTextFilterError('Data de lançamento', 'A data mínima deve ser menor do que a máxima!');
+        if((this.builtDatesMap.get(`Minimum`).getTime() > this.builtDatesMap.get(`Maximum`).getTime())){
+			this.throwNoTextFilterError(`Data de lançamento`, `A data mínima deve ser menor do que a máxima!`);
 			return false;
 		}
 
-        this.removeNoTextFilterError('Data de lançamento');
+        this.removeNoTextFilterError(`Data de lançamento`);
         return true;
     }
 
     //  Auxiliar para retornar se o ano é bissexto
-    public isLeapYear(year: number){
+    public isLeapYear(year: number) : boolean {
         return year % 400 == 0 ||
         (
             year % 4   == 0 &&
@@ -583,13 +587,13 @@ export class FiltersService {
     }
 
     //  Exibe na tela o erro relacionado ao filtro especificado
-	public throwNoTextFilterError(type: string, message: string){
+	public throwNoTextFilterError(type: string, message: string) : void {
         this.validationNoTextInputMap.get(type).valid = false;
         this.validationNoTextInputMap.get(type).message = message;
 	}
 
     //  Retira da tela o erro relacionado ao filtro especificado
-	public removeNoTextFilterError(type: string){
+	public removeNoTextFilterError(type: string) : void {
 		this.validationNoTextInputMap.get(type).valid = true;
 	}
 }

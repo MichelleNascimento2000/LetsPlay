@@ -49,7 +49,7 @@
 	</ion-item>
 
     <!-- Aplicar filtro a busca por jogos -->
-	<ion-button (click)="filtersService.searchGames(filter_name)" expand="block" shape="round" class="search-games-button-style" *ngIf="filtersService.optionsToShow.length != 0">
+	<ion-button (click)="filtersService.searchGames(filter_name)" expand="block" shape="round" class="search-games-button-style" *ngIf="filtersService.optionsToShow.length">
 		Pesquisar
 	</ion-button>
 

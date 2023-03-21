@@ -29,14 +29,14 @@ export class StageDetailsComponent implements OnInit {
 	public insertedDescription: string;
 
     //  Salvar modificações da fase (exceto a de status, que ocorre pontualmente)
-    public saveStage(): boolean {
-        if(!this.isNameDescriptionDataValid()){
+    public saveStage() : boolean {
+        if (!this.isNameDescriptionDataValid()) {
             return false;
         }
 
         //  Se o nome da fase mudou, criar item de histórico para registrar
         //  Não é criad para a descrição pois é um campo de tamanho maior e prejudica a visualização no histórico
-        if(this.didTitleChanged()){
+        if (this.didTitleChanged()) {
             this.gameplaysService.createHistoryItem(this.stage_to_show.gameplay, HistoryType.TituloStage, this.stage_to_show.name, this.insertedName, null);
         }
 
@@ -55,8 +55,8 @@ export class StageDetailsComponent implements OnInit {
     }
 
     //  Verifica se o nome e a descrição inseridos não são vazios 
-	public isNameDescriptionDataValid(): boolean {
-		if(!Boolean(this.insertedName) || !Boolean(this.insertedDescription)){
+	public isNameDescriptionDataValid() : boolean {
+		if (!Boolean(this.insertedName) || !Boolean(this.insertedDescription)) {
 			this.databaseService.showSuccessErrorToast(false, 'O nome e descrição precisam estar preenchidos!');
 			return false;
 		}
@@ -64,17 +64,17 @@ export class StageDetailsComponent implements OnInit {
 	}
 
     //  Indica se o nome ou descrição sofreu alguma modificação, a fim de ativar o botão de salvamento
-	public areInputsDifferent(): boolean {
+	public areInputsDifferent() : boolean {
 		return this.didTitleChanged() || this.didDescriptionChanged();
 	}
 
     //  Indica se o nome da fase mudou
-	public didTitleChanged(): boolean {
+	public didTitleChanged() : boolean {
 		return this.stage_to_show.name != this.insertedName;
 	}
 
     //  Indica se a descrição da fase mudou
-    public didDescriptionChanged(): boolean {
+    public didDescriptionChanged() : boolean {
 		return this.stage_to_show.description != this.insertedDescription;
 	}
 }

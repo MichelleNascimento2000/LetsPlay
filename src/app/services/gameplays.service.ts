@@ -94,14 +94,14 @@ export class GameplaysService {
     ]);
 
     //  Carregar informações dos jogos contidos dentre as gameplays salvas pelo usuário
-    public async getGameplaysInfoFromAPI(){
-        let gameplayGames: APIGame[] = [];
-        for(let gameplay of this.allGameplays){
-            this.databaseService.dataIDParam = '/' + gameplay.gameId;
-            let url = this.databaseService.getBuiltQueryURL();
+    public async getGameplaysInfoFromAPI() : Promise<void> {
+        const gameplayGames: APIGame[] = [];
+        for(const gameplay of this.allGameplays){
+            this.databaseService.dataIDParam = `/${gameplay.gameId}`;
+            const url = this.databaseService.getBuiltQueryURL();
             
-            let returnedGame = (await axios.get(url, null)).data;
-            let game: APIGame = {
+            const returnedGame = (await axios.get(url, null)).data;
+            const game: APIGame = {
                 id              : returnedGame.id,
                 name            : returnedGame.name,
                 background_image: returnedGame.background_image,
@@ -120,119 +120,119 @@ export class GameplaysService {
     }
 
    //  Exibe alert de confirmação de adição de gameplay, com mensagens diferentes caso o jogo já tenha sido previamente adicionado
-   public async confirmGameAdding(game: Game) {
-        let messageToShow: string =
+   public async confirmGameAdding(game: Game) : Promise<void> {
+        const messageToShow: string =
             this.isGameAlreadyAdded(game.id) ?
-            'Você já adicionou esse jogo à sua lista. Deseja realmente adicioná-lo de novo?' :
-            'Deseja mesmo adicionar esse jogo à lista?';
+            `Você já adicionou esse jogo à sua lista. Deseja realmente adicioná-lo de novo?`:
+            `Deseja mesmo adicionar esse jogo à lista?`;
         
         //  Em caso de confirmação, pedir que o usuário entre com o nome
         const alert = await this.alertController.create({
-            cssClass: 'base-alert-style',
+            cssClass: `base-alert-style`,
             message: messageToShow,
             buttons: [
                 {
-                    text: 'Sim',
+                    text: `Sim`,
                     handler: () => this.askGameplayName(game)
                 },
-                'Não'
+                `Não`
             ]
         });
         alert.present();
     }
 
     //  Verifica se o jogo já foi adicionado previamente
-    public isGameAlreadyAdded(gameId: number) {
+    public isGameAlreadyAdded(gameId: number) : boolean {
         return this.allGameplays.some(game => game.gameId == gameId);
     }
 
     //  Exibe alert para inserção do nome que o usuário deseja dar à gameplay
-    public async askGameplayName(game: Game) {
+    public async askGameplayName(game: Game) : Promise<void> {
 
         //  Em caso de confirmação, pedir que o usuário entre com o status da gameplay
         const alert = await this.alertController.create({
-            cssClass: 'base-alert-style',
-            message: 'Escolha um título para a sua jogatina',
+            cssClass: `base-alert-style`,
+            message: `Escolha um título para a sua jogatina`,
             inputs: [
                 {
-                    cssClass: 'alert-input',
-                    name: 'gameplayName',
-                    value: '',
-                    type: 'text'
+                    cssClass: `alert-input`,
+                    name: `gameplayName`,
+                    value: ``,
+                    type: `text`
                 }
             ],
             buttons: [
                 {
-                    text: 'OK',
+                    text: `OK`,
                     handler: alertInput => this.enterGameplayStatus(game, alertInput.gameplayName)
                 },
-                'Cancelar'
+                `Cancelar`
             ]
         });
         alert.present();
     }
 
     //  Exibe alert para inserção do status atual da gameplay sendo adicionada
-    public async enterGameplayStatus(game: Game, chosenGameplayName: string) {
+    public async enterGameplayStatus(game: Game, chosenGameplayName: string) : Promise<void> {
 
         //  O nome não deve estar vazio
         if(!Boolean(chosenGameplayName)){
-            this.databaseService.showSuccessErrorToast(false, 'Você deve inserir valores antes de continuar!');
+            this.databaseService.showSuccessErrorToast(false, `Você deve inserir valores antes de continuar!`);
             this.askGameplayName(game);
             return;
         }
 
         //  O nome não deve ter mais de 30 caracteres (por questões de melhor visualização na página)
         if(chosenGameplayName.length > 30){
-            this.databaseService.showSuccessErrorToast(false, 'O título deve ter no máximo 30 caracteres!');
+            this.databaseService.showSuccessErrorToast(false, `O título deve ter no máximo 30 caracteres!`);
             this.askGameplayName(game);
             return;
         }
 
         const statusesButtons: AlertInput[] = [
             {
-                name: 'naLista',
-                type: 'radio',
+                name: `naLista`,
+                type: `radio`,
                 label: GameplayStatusOptions.NaLista,
                 value: GameplayStatusOptions.NaLista,
                 checked: true,
-                cssClass: 'alert-input'
+                cssClass: `alert-input`
             },
             {
-                name: 'pausado',
-                type: 'radio',
+                name: `pausado`,
+                type: `radio`,
                 label: GameplayStatusOptions.Pausado,
                 value: GameplayStatusOptions.Pausado,
-                cssClass: 'alert-input'
+                cssClass: `alert-input`
             },
             {
-                name: 'jogando',
-                type: 'radio',
+                name: `jogando`,
+                type: `radio`,
                 label: GameplayStatusOptions.Jogando,
                 value: GameplayStatusOptions.Jogando,
-                cssClass: 'alert-input'
+                cssClass: `alert-input`
             },
             {
-                name: 'concluido',
-                type: 'radio',
+                name: `concluido`,
+                type: `radio`,
                 label: GameplayStatusOptions.Concluido,
                 value: GameplayStatusOptions.Concluido,
-                cssClass: 'alert-input'
+                cssClass: `alert-input`
             },
         ];
 
         //  Em caso de confirmação e de validação correta, adicionar gameplay à lista de gameplays
         const alert = await this.alertController.create({
-            cssClass: 'base-alert-style',
-            message: 'Entre com o status da gameplay',
+            cssClass: `base-alert-style`,
+            message: `Entre com o status da gameplay`,
             inputs: statusesButtons,
             buttons: [
                 {
-                    text: 'OK',
+                    text: `OK`,
                     handler: alertInputs => this.addGameToPlayList(game, alertInputs, chosenGameplayName)
 
                 },
-                'Cancelar'
+                `Cancelar`
             ]
         });
         alert.present();
@@ -241,8 +241,8 @@ export class GameplaysService {
     //  Cria o objeto para a gameplay, e adiciona à lista de todas as gameplays
     //  Recebe o jogo, o status e o nome como parâmetros
     public addGameToPlayList(game: Game, chosenStatus: string, gameplayName: string) {
-        let now = new Date().toLocaleDateString('pt-BR', this.databaseService.dateTimeFormat);
-        let gameplay: Gameplay = {
+        const now = new Date().toLocaleDateString(`pt-BR`, this.databaseService.dateTimeFormat);
+        const gameplay: Gameplay = {
             gameId                : game.id,
             gameName              : game.name,
             gameCoverURL          : game.coverURL,
@@ -276,11 +276,11 @@ export class GameplaysService {
         this.reassignProgressAndRepopulateGameplays(chosenStatus);
 
         //  Exibir Toast de sucesso
-        this.databaseService.showSuccessErrorToast(true, 'Gameplay criada com sucesso!');
+        this.databaseService.showSuccessErrorToast(true, `Gameplay criada com sucesso!`);
     }
 
     //  Reordena a paginação das gameplays dentro do status especificado
-    public reorderMapByStatus(status: string){
+    public reorderMapByStatus(status: string) : void {
 
         //  O método começará pelo primeiro item
 		this.resetItemPositionForMakingMap();
@@ -298,21 +298,21 @@ export class GameplaysService {
     //  Salvar lista de todas as gameplays no Storage
     //  Caso o parâmetro venha null, considerar a lista de todas as gameplays
     public saveGameplaysToStorage(){
-		this.storage.set('gameplays', this.allGameplays);
+		this.storage.set(`gameplays`, this.allGameplays);
 	}
 
     //  Resetar a variável auxiliar que guarda o índice da página para manipular os Maps
-    public resetPageIndexForMakingMap(){
+    public resetPageIndexForMakingMap() : void {
         this.pageIndexForMakingMap = 1;
     }
 
     //  Resetar a variável auxiliar que guarda a posição do item para manipular os Maps
-    public resetItemPositionForMakingMap(){
+    public resetItemPositionForMakingMap() : void {
         this.itemPositionForMakingMap = 0;
     }
     
     //  Resetar o Map de organização das gameplays
-    public resetBuiltGameplaysMap(status: string){
+    public resetBuiltGameplaysMap(status: string) : void {
         this.builtGameplaysToShowMap.set(status, new Map([
 			[1, []]
 		]));
@@ -320,7 +320,7 @@ export class GameplaysService {
 
     //  Popular o Map de itens com os itens de uma lista, respeitando a parametrização da paginação
     //  Adicionar itens em conjuntos de 10
-    public putItemsToMap(mapToAdd: Map<any, any>, listToFilter: any[]){
+    public putItemsToMap(mapToAdd: Map<any, any>, listToFilter: any[]) : void {
 		
         //  O método começará pela primeira página
 		this.resetPageIndexForMakingMap();
@@ -333,12 +333,12 @@ export class GameplaysService {
 
         //  Caso o status tenha sido passado, a lista deve ser filtrada por ele
         //  Caso não tenha passado, a lista inteira deve ser repassada para o Map
-		for(let item of listToFilter){
+		for (const item of listToFilter) {
             //  Incrementar posição do item
             this.itemPositionForMakingMap++;
 
-            //  Caso tenha chegado no 11, popular a primeira "página" de itens
-			if(this.itemPositionForMakingMap > 10){
+            //  Caso tenha chegado no 11, popular a primeira "página" de itens 
+			if (this.itemPositionForMakingMap > 10){
 
                 //  Popula página atualmente iterada com a lista montada de itens
 				mapToAdd.set(this.pageIndexForMakingMap, currentPageItems);
@@ -362,17 +362,17 @@ export class GameplaysService {
 	}
 
     //  Retorna o atual conjunto de gameplays de acordo com o status filtrado e a página atual
-    public getCurrentGameplaySetToShow(){
+    public getCurrentGameplaySetToShow() : Gameplay[] {
         return this.renderedBuiltGameplaysToShowMap.get(this.progressName).get(this.currentPage);
     }
 
     //  Retorna se a tab passada por parâmetro é a que está selecionada atualmente
-    public isTabSelected(tabValue: string, chosenValue: string){
+    public isTabSelected(tabValue: string, chosenValue: string) : boolean {
         return tabValue == chosenValue;
     }
 
     //  Atualizar status de progresso atual, e reprocessar Map das gameplays
-	public reassignProgressAndRepopulateGameplays(progressName: string) {
+	public reassignProgressAndRepopulateGameplays(progressName: string) : void {
 
         //  Atualiza variável que guarda o progresso atual
 		this.progressName = progressName;
@@ -388,10 +388,10 @@ export class GameplaysService {
 	}
 
     //  Popula o Map com todas as gameplays do usuário, e carrega o Map de exibição na tela filtrando por status e página
-    public populateAllGameplaysToShowMap(){
+    public populateAllGameplaysToShowMap() : void {
 
         //  Iterar por todos os status possiveis
-        for(let status of Object.values(GameplayStatusOptions)){
+        for (const status of Object.values(GameplayStatusOptions)) {
             
             //  Resetar Map das gameplays paginadas
             this.resetBuiltGameplaysMap(status);
@@ -405,10 +405,10 @@ export class GameplaysService {
     }
 
     //  Buscar gameplays por associação do texto com o nome do jogo ou da gameplay
-    public searchGameplayByTextInput(){
+    public searchGameplayByTextInput() : void {
 
         //  Se não houver input, apenas carregar todas as gameplays
-		if(!Boolean(this.gameplayTextInput)){
+		if (!Boolean(this.gameplayTextInput)) {
             this.populateAllGameplaysToShowMap();
             return;
         }
@@ -416,7 +416,7 @@ export class GameplaysService {
         this.resetPages();
 
         //  Buscar correspondência, dentre todas as gameplays do status atualmente filtrado, com nome da gameplay ou do jogo
-        let input = this.formatInput(this.gameplayTextInput);
+        const input = this.formatInput(this.gameplayTextInput);
         this.populateRenderedMapWithFilteredGameplays(
             Array.from(this.builtGameplaysToShowMap.get(this.progressName).values()).flatMap(value => value)
             .filter(play => this.formatInput(play.name)    .includes(input) || 
@@ -427,10 +427,10 @@ export class GameplaysService {
 	}
     
     //  Exibir apenas as gameplays filtradas a partir do input textual 
-    public populateRenderedMapWithFilteredGameplays(filteredGameplays: Gameplay[]){
+    public populateRenderedMapWithFilteredGameplays(filteredGameplays: Gameplay[]) : void {
 
         //  Executar operação para todos os status de gameplay
-		for(let status of Object.values(GameplayStatusOptions)){
+		for (const status of Object.values(GameplayStatusOptions)) {
 
             //  Resetar gameplays atualmente exibidas
 			this.resetRenderedBuiltGameplaysMap(status);
@@ -441,48 +441,48 @@ export class GameplaysService {
 	}
 
     //  Resetar o Map de exibição das gameplays filtradas a serem lançadas pontualmente na página
-    public resetRenderedBuiltGameplaysMap(status: string){
+    public resetRenderedBuiltGameplaysMap(status: string) : void {
         this.renderedBuiltGameplaysToShowMap.set(status, new Map([
             [1, []]
         ]));
     }
 
     //  Formatar string recebida, retirando caracteres especiais e deixando tudo em maiúsculas
-    public formatInput(input: string): string{
+    public formatInput(input: string): string {
         return this.replaceSpecialCharactersLetters(input).toUpperCase();
     }
 
     //  Retirar caracteres especiais de string recebida
-    public replaceSpecialCharactersLetters(text: string): string{
+    public replaceSpecialCharactersLetters(text: string): string {
 		return text
-			.replace('á', 'a')
-			.replace('à', 'a')
-			.replace('ã', 'a')
-			.replace('â', 'a')
-			.replace('ä', 'a')
-			.replace('é', 'e')
-			.replace('è', 'e')
-			.replace('ê', 'e')
-			.replace('ë', 'e')
-			.replace('í', 'i')
-			.replace('ì', 'i')
-			.replace('î', 'i')
-			.replace('ï', 'i')
-			.replace('ó', 'o')
-			.replace('ò', 'o')
-			.replace('ô', 'o')
-			.replace('õ', 'o')
-			.replace('ö', 'o')
-			.replace('ú', 'u')
-			.replace('ù', 'u')
-			.replace('û', 'u')
-			.replace('ü', 'u')
-			.replace('ñ', 'n');
+			.replace(`á`, `a`)
+			.replace(`à`, `a`)
+			.replace(`ã`, `a`)
+			.replace(`â`, `a`)
+			.replace(`ä`, `a`)
+			.replace(`é`, `e`)
+			.replace(`è`, `e`)
+			.replace(`ê`, `e`)
+			.replace(`ë`, `e`)
+			.replace(`í`, `i`)
+			.replace(`ì`, `i`)
+			.replace(`î`, `i`)
+			.replace(`ï`, `i`)
+			.replace(`ó`, `o`)
+			.replace(`ò`, `o`)
+			.replace(`ô`, `o`)
+			.replace(`õ`, `o`)
+			.replace(`ö`, `o`)
+			.replace(`ú`, `u`)
+			.replace(`ù`, `u`)
+			.replace(`û`, `u`)
+			.replace(`ü`, `u`)
+			.replace(`ñ`, `n`);
 	}
 
     //  Cria um item de histórico de modificações para a gameplay em questão
 	public createHistoryItem(gameplay: Gameplay, historyType: HistoryType, oldValue: string, newValue: string, additional: any){
-        let now = new Date().toLocaleDateString('pt-BR', this.databaseService.dateTimeFormat);
+        const now = new Date().toLocaleDateString(`pt-BR`, this.databaseService.dateTimeFormat);
 
         //  Map parametrizando cada texto de cada histórico 
         const historyTypeToTextMap: Map<HistoryType, string> = new Map([
@@ -506,7 +506,7 @@ export class GameplaysService {
 	}
 
     //  Carregar histórico paginado de acordo com a gameplay passada como parâmetro
-	public populateAllHistoriesToShowMap(gameplay: Gameplay){
+	public populateAllHistoriesToShowMap(gameplay: Gameplay) : void {
 
         //  Resetar itens de histórico atualmente exibidos
 		this.resetBuiltHistoriesMap();
@@ -516,28 +516,28 @@ export class GameplaysService {
 	}
 
     //  Resetar o Map de exibição das stages
-    public resetBuiltHistoriesMap(){
+    public resetBuiltHistoriesMap() : void {
 		this.builtHistoriesToShowMap.set(1, []);
     }
 
     //  Exibe mensagem de confirmação para mudança de status da gameplay
-    public async confirmGameStatusChange(game: Gameplay) {
+    public async confirmGameStatusChange(game: Gameplay) : Promise<void> {
 
         //  Variáveis para controle do novo e do antigo status
-        let newStatus = game.status;
-        let oldStatus = game.oldStatus;
+        const newStatus = game.status;
+        const oldStatus = game.oldStatus;
 
         //  Em caso de confirmação, efetuar a mudança
         const alert = await this.alertController.create({
-            cssClass: 'base-alert-style',
+            cssClass: `base-alert-style`,
             message: `Você deseja mesmo mudar esse jogo de "${game.oldStatus}" para "${game.status}"?`,
             buttons: [
                 {
-                    text: 'Sim',
+                    text: `Sim`,
                     handler: () => this.makeGameStatusChange(game, newStatus)
                 },
                 {
-                    text: 'Não'
+                    text: `Não`
                 }
                 
             ]
@@ -552,7 +552,7 @@ export class GameplaysService {
 
 
     //  Efetuar troca de status da gameplay passada pelo novo status, também recebido
-    public makeGameStatusChange(game: Gameplay, newStatus: string){
+    public makeGameStatusChange(game: Gameplay, newStatus: string) : void {
 
         //  O status antigo é o status cujas gameplays serão renderizadas na página após fim da operação
         this.progressName = game.oldStatus;
@@ -568,11 +568,11 @@ export class GameplaysService {
 
         this.saveGameplaysToStorage();
 
-        this.databaseService.showSuccessErrorToast(true, 'Status da gameplay alterado com sucesso!');
+        this.databaseService.showSuccessErrorToast(true, `Status da gameplay alterado com sucesso!`);
     }
 
     //  Atualizar data da última modificação, e reordenar todas as gameplays com base nessa data
-	public updateGameplayLastModifiedDate(game: Gameplay){
+	public updateGameplayLastModifiedDate(game: Gameplay) : void {
 		game.lastModifiedDate = new Date();
 
         //  Reordenação para exibir primeiro as modificadas mais recentemente
@@ -587,10 +587,10 @@ export class GameplaysService {
 
     //  Reordenação das gameplays para inserir as com modificação mais recente primeiro
     //  Aplicação do Bubble Sort
-	public reorderGameplaysByDate(){
+	public reorderGameplaysByDate() : void {
 
         //  Tamanho do array de gameplays
-		let length = this.allGameplays.length;
+		const length = this.allGameplays.length;
 
         //  Controle para ordenação cessar
 		let isNotInOrder = true;
@@ -599,17 +599,17 @@ export class GameplaysService {
 			isNotInOrder = false;
 
             //  Do primeiro até o penúltimo
-			for(let i = 0; i < length - 1; i++){
+			for (let i = 0; i < length - 1; i++) {
 
                 //  Do segundo até o último
-				for(let j = i + 1; j < length; j++){
+				for (let j = i + 1; j < length; j++) {
 
-                    //  Comparar se todos os pares de elementos possíveis precisam ser trocados de posição
-					if(this.allGameplays[i].lastModifiedDate < this.allGameplays[j].lastModifiedDate){
+                    //  Comparar se todos os pares de elementos possíveis precisam ser trocados de posição 
+					if (this.allGameplays[i].lastModifiedDate < this.allGameplays[j].lastModifiedDate){
 
                         //  Troca de posição
-						let auxI = this.allGameplays[i];
-						let auxJ = this.allGameplays[j];
+						const auxI = this.allGameplays[i];
+						const auxJ = this.allGameplays[j];
 						this.allGameplays[i] = auxJ;
 						this.allGameplays[j] = auxI;
 
@@ -624,19 +624,19 @@ export class GameplaysService {
 	}
 
     //  Exibe mensagem de confirmação para deleção de gameplay
-    public async confirmGameDeletion(game: Gameplay){
+    public async confirmGameDeletion(game: Gameplay) : Promise<void> {
 
         //  Em caso de confirmação, seguir com a deleção
         const alert = await this.alertController.create({
-            cssClass: 'base-alert-style',
-            message: 'Você deseja mesmo deletar essa gameplay? Essa ação não pode ser desfeita',
+            cssClass: `base-alert-style`,
+            message: `Você deseja mesmo deletar essa gameplay? Essa ação não pode ser desfeita`,
             buttons: [
                 {
-                    text: 'Sim',
+                    text: `Sim`,
                     handler: () => this.deleteGameplay(game)
                 },
                 {
-                    text: 'Não'
+                    text: `Não`
                 }
                 
             ]
@@ -645,8 +645,8 @@ export class GameplaysService {
     }
 
     //  Deletar gameplay especificada da lista
-    public async deleteGameplay(gameplay: Gameplay){
-        let currentStatus: string = gameplay.status;
+    public async deleteGameplay(gameplay: Gameplay) : Promise<void> {
+        const currentStatus: string = gameplay.status;
         this.allGameplays.splice(
             this.allGameplays.findIndex(play => play == gameplay), 1
         );
@@ -658,17 +658,17 @@ export class GameplaysService {
         this.reassignProgressAndRepopulateGameplays(currentStatus);
 
         //  Exibe mensagem de sucesso
-        this.databaseService.showSuccessErrorToast(true, 'Gameplay deletada com sucesso!');
+        this.databaseService.showSuccessErrorToast(true, `Gameplay deletada com sucesso!`);
     }
 
     //  Personalizar o retorno a partir da página de gameplays
     //  Ela pode ser acessada a partir da Home ou a partir da página de Busca
     public returnFromGameplaysPage(){
-        this.router.navigate(this.comingFromSearch ? ['search'] : ['home']);
+        this.router.navigate(this.comingFromSearch ? [`search`] : [`home`]);
     }
 
     //  Campo de controle para apontar qual é a página pela qual a página de gameplays foi acessada
-	public setComingFromSearch(comingFromSearch){
+	public setComingFromSearch(comingFromSearch: boolean) : void {
 		this.comingFromSearch = comingFromSearch;
 	}
 
@@ -676,39 +676,39 @@ export class GameplaysService {
 
 
     //  Carregar seção especificada da página de detalhes da gameplay
-    public loadGameplayDetailsSection(gameplayDetailsSection: string) {
+    public loadGameplayDetailsSection(gameplayDetailsSection: string) : void {
 		this.resetPages();
 		this.gameplayDetailsSection = gameplayDetailsSection;
 	}
 
     //  Exibe alert para entrada das infos de nome e descrição da nova fase da gameplay atual
-    public async enterNameDescription() {
+    public async enterNameDescription() : Promise<void> {
 
         //  Em caso de confirmação, prosseguir com a entrada do status da fase
 		const alert = await this.alertController.create({
-			cssClass: 'base-alert-style',
-			message: 'Entre com as informações da fase',
+			cssClass: `base-alert-style`,
+			message: `Entre com as informações da fase`,
 			inputs: [
 				{
-					name: 'stageName',
-					value: '',
-					type: 'text',
-					placeholder: 'Nome'
+					name: `stageName`,
+					value: ``,
+					type: `text`,
+					placeholder: `Nome`
 				},
 				{
-					name: 'stageDescription',
-					value: '',
-					type: 'text',
-					placeholder: 'Descrição'
+					name: `stageDescription`,
+					value: ``,
+					type: `text`,
+					placeholder: `Descrição`
 				}
 			],
 			buttons: [
 				{
-					text: 'OK',
+					text: `OK`,
 					handler: alertInputs => this.enterStageStatus(alertInputs.stageName, alertInputs.stageDescription)
 
 				},
-				'Cancelar'
+				`Cancelar`
 			]
 		});
 
@@ -716,68 +716,68 @@ export class GameplaysService {
 	}
 
     //  Exibe alert para o usuário selecionar o status da nova fase
-    public async enterStageStatus(chosenStageName: string, chosenStageDescription: string) {
+    public async enterStageStatus(chosenStageName: string, chosenStageDescription: string) : Promise<void> {
         
         //  O nome e a descrição enviados não podem estar vazios
         if(!Boolean(chosenStageName) || !Boolean(chosenStageDescription)){
-            this.databaseService.showSuccessErrorToast(false, 'Você deve inserir valores antes de continuar!');
+            this.databaseService.showSuccessErrorToast(false, `Você deve inserir valores antes de continuar!`);
 			this.enterNameDescription();
             return;
         }
 
         //  Em caso de confirmação, prosseguir com a criação da fase
         const alert = await this.alertController.create({
-            cssClass: 'base-alert-style',
-            message: 'Entre com o status da fase',
+            cssClass: `base-alert-style`,
+            message: `Entre com o status da fase`,
             inputs: [
                 {
-                    name: 'emProgresso',
-                    type: 'radio',
+                    name: `emProgresso`,
+                    type: `radio`,
                     label: GameplayStageStatusOptions.EmProgresso,
                     value: GameplayStageStatusOptions.EmProgresso,
                     checked: true,
-                    cssClass: 'input1'
+                    cssClass: `input1`
                 },
                 {
-                    name: 'pausado',
-                    type: 'radio',
+                    name: `pausado`,
+                    type: `radio`,
                     label: GameplayStageStatusOptions.Pausado,
                     value: GameplayStageStatusOptions.Pausado,
-                    cssClass: 'input1'
+                    cssClass: `input1`
                 },
                 {
-                    name: 'concluido',
-                    type: 'radio',
+                    name: `concluido`,
+                    type: `radio`,
                     label: GameplayStageStatusOptions.Concluido,
                     value: GameplayStageStatusOptions.Concluido,
-                    cssClass: 'input1'
+                    cssClass: `input1`
                 }
             ],
             buttons: [
                 {
-                    text: 'OK',
+                    text: `OK`,
                     handler: alertInputs => this.addStage(chosenStageName, chosenStageDescription, alertInputs)
 
                 },
-                'Cancelar'
+                `Cancelar`
             ]
         });
         alert.present();
 	}
 
     //  Criar nova fase e atribuí-la à gameplay sendo exibida
-    public async addStage(chosenStageName: string, chosenStageDescription: string, chosenStatus: GameplayStageStatusOptions){
-        let date = new Date();
+    public async addStage(chosenStageName: string, chosenStageDescription: string, chosenStatus: GameplayStageStatusOptions) : Promise<void> {
+        const date = new Date();
 
-        let stage: GameplayStage = {
+        const stage: GameplayStage = {
             gameplay              : this.gameplayToShow,
             id                    : this.gameplayToShow.stagesCreated + 1,
             name                  : chosenStageName,
             description           : chosenStageDescription,
             status                : chosenStatus,
             oldStatus             : chosenStatus,
-            createdDate           : date.toLocaleString('pt-BR', this.databaseService.dateTimeFormat),
-            lastModifiedDateString: date.toLocaleString('pt-BR', this.databaseService.dateTimeFormat),
+            createdDate           : date.toLocaleString(`pt-BR`, this.databaseService.dateTimeFormat),
+            lastModifiedDateString: date.toLocaleString(`pt-BR`, this.databaseService.dateTimeFormat),
             lastModifiedDate      : date
         }
 
@@ -803,21 +803,21 @@ export class GameplaysService {
         this.applyStageStatusAndTextFilter();
 
         //  Exibe mensagem de sucesso
-        this.databaseService.showSuccessErrorToast(true, 'Fase criada com sucesso!');
+        this.databaseService.showSuccessErrorToast(true, `Fase criada com sucesso!`);
     }
 
     //  Seta a fase atual usando a fase recebida como parâmetro, e redireciona para tela de detalhes da fase
-	public loadStage(stage: GameplayStage) {
+	public loadStage(stage: GameplayStage) : void {
 		this.currentStage = stage;
 
-		this.router.navigate(['stages']);
+		this.router.navigate([`stages`]);
 	}
 
     //  Carregar fases paginadas de acordo com cada status da fase da gameplay sendo exibida
-	public populateAllCurrentGameplayStagesMap(){
+	public populateAllCurrentGameplayStagesMap() : void {
 
         //  Iterar por todos os status possíveis das fases
-		for(let status of Object.values(GameplayStageStatusOptions)){
+		for (const status of Object.values(GameplayStageStatusOptions)) {
 			
             //  Resetar stages atualmente exibidas
 			this.resetBuiltStagesMap(status)
@@ -827,24 +827,24 @@ export class GameplaysService {
 		}
 		
         //  Cria conjunto separado para guardar todas as fases
-		this.builtStagesToShowMap.set('Todos', new Map([
+		this.builtStagesToShowMap.set(`Todos`, new Map([
 			[1, []]
 		]));
-		this.putItemsToMap(this.builtStagesToShowMap.get('Todos'), this.gameplayToShow.stages);
+		this.putItemsToMap(this.builtStagesToShowMap.get(`Todos`), this.gameplayToShow.stages);
 	}
 
     //  Resetar o Map de exibição das stages
-    public resetBuiltStagesMap(status: string){
+    public resetBuiltStagesMap(status: string) : void {
         this.builtStagesToShowMap.set(status, new Map([
             [1, []]
         ]));
     }
 
     //  Aplicar mudança de status e filtro de texto às fases sendo exibidas no momento
-	public applyStageStatusAndTextFilter(){
+	public applyStageStatusAndTextFilter() : void {
 
         //  Se o filtro for diferente de "Todos"
-		if(this.chosenStageStatus != 'Todos'){
+		if(this.chosenStageStatus != `Todos`){
 
             //  Filtrar fases que tenham o status escolhido no momento, e adicionar na lista
 			this.currentFilteredStagesByStatus = this.gameplayToShow.stages.filter(
@@ -861,7 +861,7 @@ export class GameplaysService {
 	}
 
     //  Aplicar filtragem das fases por input de texto, linkando com os campos de nome, descrição e ID da fase
-    public searchStageByTextInput(){
+    public searchStageByTextInput() : void {
 
         //  Resetar páginas pois a filtragem precisa ser exibida da primeira página pra frente
 		this.resetPages();
@@ -870,14 +870,14 @@ export class GameplaysService {
         this.resetRenderedStagesMap();
 
         //  Se não há nada no input de texto, apenas exibir as fases que jã estão filtradas por status
-		if(!Boolean(this.stageTextInput)){
+		if (!Boolean(this.stageTextInput)) {
             this.putItemsToMap(this.renderedGameplayStagesMap, this.currentFilteredStagesByStatus);
             return;
         }
 
         //  Filtrar por nome, descrição ou ID
-        let input = this.formatInput(this.stageTextInput);
-        let textFilteredStages = this.currentFilteredStagesByStatus.filter(
+        const input = this.formatInput(this.stageTextInput);
+        const textFilteredStages = this.currentFilteredStagesByStatus.filter(
             stage =>    (String)(stage.id) == this.stageTextInput || 
                         this.formatInput(stage.name).includes(input) || 
                         this.formatInput(stage.description).includes(input)
@@ -888,7 +888,7 @@ export class GameplaysService {
     }
     
     //  Carregar todas as fases da gameplay em questão no Map de fases renderizadas
-    public loadGameplayStagesAllStatus() {
+    public loadGameplayStagesAllStatus() : void {
 
         //  Atribuir a lista puxada direto do registro da gameplay
         this.currentFilteredStagesByStatus = this.gameplayToShow.stages;
@@ -902,33 +902,33 @@ export class GameplaysService {
     }
 
     //  Retorna o atual conjunto de fases de acordo com o status e texto filtrados, e a página atual
-    public resetRenderedStagesMap(){
-        return this.renderedGameplayStagesMap = new Map();
+    public resetRenderedStagesMap() : void {
+        this.renderedGameplayStagesMap = new Map();
     }
 
     //  Retorna o atual conjunto de fases de acordo com o status e texto filtrados, e a página atual
-    public getCurrentStagesSetToShow(){
+    public getCurrentStagesSetToShow() : GameplayStage[] {
         return this.renderedGameplayStagesMap.get(this.currentPage);
     }
 
     //  Exibir alert com mensagem de confirmação para mudança de status da fase
-	public async confirmStageStatusChange(stage: GameplayStage) {
+	public async confirmStageStatusChange(stage: GameplayStage) : Promise<void> {
 
         //  Variáveis para controle do antigo e novo statuss
-		let newStatus = stage.status;
-		let oldStatus = stage.oldStatus;
+		const newStatus = stage.status;
+		const oldStatus = stage.oldStatus;
 
         //  Em caso de confirmação, seguir com a mudança
 		const alert = await this.alertController.create({
-			cssClass: 'base-alert-style',
+			cssClass: `base-alert-style`,
 			message: `Você deseja mesmo mudar essa fase de "${stage.oldStatus}" para "${stage.status}"?`,
 			buttons: [
 				{
-					text: 'Sim',
+					text: `Sim`,
 					handler: () => this.makeStageStatusChange(stage, newStatus)
 				},
 				{
-					text: 'Não'
+					text: `Não`
 				}
 				
 			]
@@ -942,7 +942,7 @@ export class GameplaysService {
 	}
 
     //  Efetuar mudança de status da fase
-	public makeStageStatusChange(stage: GameplayStage, newStatus: GameplayStageStatusOptions){
+	public makeStageStatusChange(stage: GameplayStage, newStatus: GameplayStageStatusOptions) : void {
 
         //  Criar item de histórico para registrar a mudança
 		this.createHistoryItem(stage.gameplay, HistoryType.StatusStage, stage.status, newStatus, stage.name);
@@ -955,12 +955,12 @@ export class GameplaysService {
 
 		this.saveGameplaysToStorage();
 
-		this.databaseService.showSuccessErrorToast(true, 'Status da fase alterado com sucesso!');
+		this.databaseService.showSuccessErrorToast(true, `Status da fase alterado com sucesso!`);
 	}
 
     //  Atualizar data da última modificação, e reordenar todas as fases com base nessa data
     public updateStageLastModifiedDate(stage: GameplayStage){
-        stage.lastModifiedDateString = new Date().toLocaleString('pt-BR', this.databaseService.dateTimeFormat);
+        stage.lastModifiedDateString = new Date().toLocaleString(`pt-BR`, this.databaseService.dateTimeFormat);
 
         //  Atualizar a última modificação da gameplay também
         this.updateGameplayLastModifiedDate(stage.gameplay);
@@ -977,13 +977,13 @@ export class GameplaysService {
 
     //  Reordenação das fases da gameplay atual para inserir as com modificação mais recente primeiro
     //  Aplicação do Bubble Sort
-	public reorderStagesByDate(stage: GameplayStage){
+	public reorderStagesByDate(stage: GameplayStage) : void {
 		
         //  Todas as fases da gameplay atual
-        let allStages = stage.gameplay.stages;
+        const allStages = stage.gameplay.stages;
         
         //  Tamanho do array de gameplays
-        let length = allStages.length;
+        const length = allStages.length;
 		
         //  Controle para ordenação cessar
 		let isNotInOrder = true;
@@ -992,17 +992,17 @@ export class GameplaysService {
 			isNotInOrder = false;
 
             //  Do primeiro até o penúltimo
-			for(let i = 0; i < length - 1; i++){
+			for (let i = 0; i < length - 1; i++) {
 
                 //  Do segundo até o último
-				for(let j = i + 1; j < length; j++){
+				for (let j = i + 1; j < length; j++) {
                     
-                    //  Comparar se todos os pares de elementos possíveis precisam ser trocados de posição
-					if(allStages[i].lastModifiedDate < allStages[j].lastModifiedDate){
+                    //  Comparar se todos os pares de elementos possíveis precisam ser trocados de posição 
+					if (allStages[i].lastModifiedDate < allStages[j].lastModifiedDate){
 
                         //  Troca de posição
-						let auxI = allStages[i];
-						let auxJ = allStages[j];
+						const auxI = allStages[i];
+						const auxJ = allStages[j];
 						allStages[i] = auxJ;
 						allStages[j] = auxI;
 
@@ -1015,19 +1015,19 @@ export class GameplaysService {
 	}
 
     //  Exibe alert de confirmação para deleção da fase
-	public async confirmStageDeletion(stage: GameplayStage){
+	public async confirmStageDeletion(stage: GameplayStage) : Promise<void> {
 		
         //  Em caso de confirmação, prosseguir com a deleção
         const alert = await this.alertController.create({
-			cssClass: 'base-alert-style',
-			message: 'Você deseja mesmo deletar essa fase? Essa ação não pode ser desfeita',
+			cssClass: `base-alert-style`,
+			message: `Você deseja mesmo deletar essa fase? Essa ação não pode ser desfeita`,
 			buttons: [
 				{
-					text: 'Sim',
+					text: `Sim`,
 					handler: () => this.deleteStage(stage)
 				},
 				{
-					text: 'Não'
+					text: `Não`
 				}
 				
 			]
@@ -1036,7 +1036,7 @@ export class GameplaysService {
 	}
 
     //  Deletar fase da gameplay
-	public async deleteStage(stage: GameplayStage){
+	public async deleteStage(stage: GameplayStage) : Promise<void> {
 
         //  Atualizar data de última modificação da gameplay
 		this.updateGameplayLastModifiedDate(this.gameplayToShow);
@@ -1056,11 +1056,11 @@ export class GameplaysService {
 		this.applyStageStatusAndTextFilter();
 
         //  Exibir mensagem de sucesso
-		this.databaseService.showSuccessErrorToast(true, 'Stage deletada com sucesso!');
+		this.databaseService.showSuccessErrorToast(true, `Stage deletada com sucesso!`);
 	}
 
     //  Método chamado para que, a cada vez que a seção de anotações é modificada, a gameplay é atualizada no Storage
-    public updateGameplays(){
+    public updateGameplays() : void {
 
         //  Atualizar data da última modificação
 		this.updateGameplayLastModifiedDate(this.gameplayToShow);
@@ -1070,18 +1070,18 @@ export class GameplaysService {
 	}
 
     //  Ação a ser realizada ao fazer importação de gameplays
-    public importPlays(){
+    public importPlays() : void {
 
         //  Apenas chama o alert solicitando que o usuário entre com o texto de backup
-        this.showImportExportAlert('', true);
+        this.showImportExportAlert(``, true);
     }
     
     //  Ação a ser realizada ao fazer exportação de gameplays
-    public exportPlays(){
-        let gameplayObjects = [];
+    public exportPlays() : void {
+        const gameplayObjects = [];
 
         //  Realiza um Stringify de todas as gameplays e os seus dados
-        for(const gameplay of this.allGameplays){
+        for (const gameplay of this.allGameplays) {
             gameplayObjects.push(JSON.stringify({
                 gameId                : gameplay.gameId,
                 gameName              : gameplay.gameName,
@@ -1114,32 +1114,32 @@ export class GameplaysService {
     }
 
     //  Ao clicar no botão de importação ou exportação de gameplays, exibir alert de manipulação dos dados
-    public async showImportExportAlert(content: string, isImport: boolean) {
+    public async showImportExportAlert(content: string, isImport: boolean) : Promise<void> {
 
         //  Exibe mensagens diferentes para importação e para exportação
-		let message =   isImport ? 
-                        'Cole abaixo o texto com o backup das suas jogatinas.' :
-                        'Copie e cole o texto abaixo em um local seguro, este é o seu backup.';
+		const message =   isImport ? 
+                        `Cole abaixo o texto com o backup das suas jogatinas.` :
+                        `Copie e cole o texto abaixo em um local seguro, este é o seu backup.`;
 
         //  Valor a ser exibido no campo de input/output também depende do tipo de operação 
-		let value = isImport ? '' : content;
+		const value = isImport ? `` : content;
     
         //  Caso seja exportação, apenas fechar o alert ao clicar OK
         //  Caso seja importação, chamar processo responsável por traduzir o JSON de backup e converter em gameplays
 		const alert = await this.alertController.create({
-			cssClass: 'base-alert-style',
+			cssClass: `base-alert-style`,
 			message: message,
 			inputs: [
 				{
-					name: 'backup',
+					name: `backup`,
 					value: value,
-					type: 'text'
+					type: `text`
 				}
 			],
 			buttons: [
 				{
-					text: 'OK',
-					handler:    importValue => (isImport && importValue.backup != '') ? 
+					text: `OK`,
+					handler:    importValue => (isImport && Boolean(importValue.backup)) ? 
                                 this.makeImportProcess(importValue.backup) : alert.dismiss()
 				},
 			]
@@ -1148,10 +1148,10 @@ export class GameplaysService {
 	}
 
 	//  Realiza o processo de importação, recebendo a string JSON com todas as gameplays
-	public makeImportProcess(value: string){
-        try{
-            for(let stringObject of JSON.parse(value)){
-                let newGameplay: Gameplay = {
+	public makeImportProcess(value: string) : void {
+        try {
+            for (const stringObject of JSON.parse(value)) {
+                const newGameplay: Gameplay = {
                     gameId                : stringObject.gameId,
                     gameName              : stringObject.gameName,
                     gameCoverURL          : stringObject.gameCoverURL,
@@ -1195,53 +1195,53 @@ export class GameplaysService {
             this.populateAllGameplaysToShowMap();
 
             //  Exibe mensagem de sucesso
-            this.databaseService.showSuccessErrorToast(true, 'Sucesso ao importar!');
+            this.databaseService.showSuccessErrorToast(true, `Sucesso ao importar!`);
 
-        } catch (error){
+        } catch (error) {
 
             //  Exibe mensagem de erro
-            this.databaseService.showSuccessErrorToast(false, 'Erro ao importar: ' + error);
+            this.databaseService.showSuccessErrorToast(false, `Erro ao importar: ${error}`);
         }
 	}
 
     //  Retorna o conjunto atual de itens, dado o tipo de item, o status e o número da página atual
     public getSetOfItemsByTypeStatusPage(itemType: string, status: string, page: number): any[]{
-        if(itemType == 'Gameplays'){
+        if(itemType == `Gameplays`){
             return this.renderedBuiltGameplaysToShowMap.get(status).get(page);
         }
 
-        if(itemType == 'Stages'){
+        if(itemType == `Stages`){
             return this.builtStagesToShowMap.get(status).get(page);
         }
 
-        if(itemType == 'History'){
+        if(itemType == `History`){
             return this.builtHistoriesToShowMap.get(page);
         }
     }
 	
     //  Ir para próxima página
-	public forwardPage(pageType: string){
+	public forwardPage(pageType: string) : void {
         const status = 
-            pageType == 'Gameplays' ? this.progressName : 
-            pageType == 'Stages'    ? this.chosenStageStatus : null;
+            pageType == `Gameplays` ? this.progressName : 
+            pageType == `Stages`    ? this.chosenStageStatus : null;
 
         const pageItems     = this.getSetOfItemsByTypeStatusPage(pageType, status, this.currentPage);
         const nextPageItems = this.getSetOfItemsByTypeStatusPage(pageType, status, this.currentPage + 1);
 		
-        if(pageItems?.length == 10 && nextPageItems?.length > 0){
+        if (pageItems?.length  == 10 && nextPageItems?.length > 0){
             this.currentPage++;
 		}
 	}
     
     //  Ir para página anterior
-    public backPage(){
-        if(this.currentPage > 1){
+    public backPage() : void {
+        if (this.currentPage >  1){
             this.currentPage--;
         }
     }
 
     //  Voltar página para a primeira  
-	public resetPages(){
+	public resetPages() : void {
 		this.currentPage = 1;
 	}
 }

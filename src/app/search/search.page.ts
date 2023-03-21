@@ -29,12 +29,12 @@ export class SearchPage implements OnInit {
     
     //  Método para passar como parâmetro no pipe do keyValue dos filtros
     //  Exibe os filtros na ordem inserida na classe Enum
-	public originalOrder = (a: KeyValue<string, string>, b: KeyValue<string, string>): number => {
+	public originalOrder = (a: KeyValue<string, string>, b: KeyValue<string, string>) : number => {
 		return 0;
 	}
 
     //  Atualizar variável do filtro atual e navegar para a página de listagem de filtros
-    public changeCurrentFilter(filterName: string): void{
+    public changeCurrentFilter(filterName: string) : void {
 		this.filtersService.currentFilterName = filterName;
 		this.router.navigate(['filter']);
 	}

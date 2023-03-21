@@ -117,7 +117,7 @@
 		</ion-row>
 
         <!-- Descrição do jogo -->
-		<ion-row *ngIf="game_to_show.description != null">
+		<ion-row *ngIf="databaseService.isNotNull(game_to_show.description)">
 			<ion-col size="4">
 				<ion-card class="title-description-card-style">
 					<ion-text>Descrição<br></ion-text>
@@ -127,7 +127,7 @@
 		<ion-row style="margin-bottom: 100px;">
 			<ion-col size="12">
 				<ion-card class="description-card-style">
-					<ion-text *ngIf="game_to_show.description != null; else noDescription">{{game_to_show.description}}<br></ion-text>
+					<ion-text *ngIf="databaseService.isNotNull(game_to_show.description); else noDescription">{{game_to_show.description}}<br></ion-text>
 					<ng-template #noDescription>
 						<ion-text>Sem descrição registrada<br></ion-text>
 					</ng-template>
