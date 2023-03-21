@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Let\'s Play</string>
+    <string name="title_activity_main">Let\'s Play</string>
+    <string name="package_name">br.michellenasci.letsplay</string>
+    <string name="custom_url_scheme">br.michellenasci.letsplay</string>
+</resources>

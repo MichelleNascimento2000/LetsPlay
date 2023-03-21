@@ -1,7 +1,7 @@
 {
-    "name": "Let's Play",
-    "integrations": {
-        "capacitor": {}
-    },
-    "type": "angular"
+  "name": "Let's Play",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
 }
